@@ -1,0 +1,11 @@
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<th:block th:fragment="navbar">
+    <div class="menu">
+        <a th:href="@{/feed}" class="nav-active">Home</a>
+        <a th:href="@{/discover}" class="">Discover</a>
+        <a th:href="@{/logout}">Logout</a>
+        <a th:href="@{/profile}" class="">Me</a>
+        <span th:text="|Welcome, ${username}|"></span>
+    </div>
+</th:block>

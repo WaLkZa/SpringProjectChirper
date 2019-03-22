@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/head"></th:block>
+</head>
+<body>
+<div id="main">
+    <header><span>Chirper</span></header>
+
+    <div class="content">
+        <form id="formLogin" class="form chirps" th:action="@{/login}" th:method="POST">
+            <label>Username</label>
+            <input name="username" type="text">
+            <label>Password</label>
+            <input name="password" type="password">
+            <input type="checkbox" id="rememberMe" name="rememberMe">
+            <label for="rememberMe">Remember Me</label>
+            <input id="btnLogin" value="Sign In" type="submit">
+            <a th:href="@{/register}">Register</a>
+        </form>
+    </div>
+
+    <footer><p>Chirper &copy; 2019</p></footer>
+</div>
+</body>
+</html>
