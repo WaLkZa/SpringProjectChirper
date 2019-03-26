@@ -16,6 +16,12 @@ public class Chirp extends BaseEntity {
     public Chirp() {
     }
 
+    public Chirp(String content, LocalDateTime dateAdded, User author) {
+        this.content = content;
+        this.dateAdded = dateAdded;
+        this.author = author;
+    }
+
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     public String getContent() {
         return content;
@@ -34,7 +40,7 @@ public class Chirp extends BaseEntity {
         this.dateAdded = dateAdded;
     }
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne()
     @JoinColumn(name = "author_id", nullable = false)
     public User getAuthor() {
         return author;

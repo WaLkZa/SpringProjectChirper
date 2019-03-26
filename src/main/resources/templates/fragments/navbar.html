@@ -2,10 +2,10 @@
       xmlns:th="http://www.thymeleaf.org">
 <th:block th:fragment="navbar">
     <div class="menu">
-        <a th:href="@{/feed}" class="nav-active">Home</a>
-        <a th:href="@{/discover}" class="">Discover</a>
+        <a th:href="@{/feed}" th:classappend="${#request.getRequestURI() == '/feed' ? 'nav-active' : ''}">Home</a>
+        <a th:href="@{/discover}" th:classappend="${#request.getRequestURI() == '/discover' ? 'nav-active' : ''}">Discover</a>
         <a th:href="@{/logout}">Logout</a>
-        <a th:href="@{/profile}" class="">Me</a>
-        <span th:text="|Welcome, ${username}|"></span>
+        <a th:href="@{/profile}" th:classappend="${#request.getRequestURI() == '/profile' ? 'nav-active' : ''}">Me</a>
+        <span th:text="|Welcome, ${loggedUsername}|"></span>
     </div>
 </th:block>

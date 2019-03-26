@@ -14,14 +14,14 @@
         <div class="chirps">
             <h2 class="titlebar">Discover</h2>
             <div id="userlist">
-                <div class="userbox">
-                    <div><a href="#" class="chirp-author">vako</a></div>
+
+                <div class="userbox" th:each="user : ${allUsers}">
+                    <div><a th:href="@{'/profile/' + ${user.username}}" class="chirp-author" th:text="*{user.username}"></a></div>
 
                     <div class="user-details">
-                        <span>3 followers</span>
+                        <span>TODO followers</span>
                     </div>
                 </div>
-                <!-- TODO Load more user profiles -->
             </div>
         </div>
     </div>

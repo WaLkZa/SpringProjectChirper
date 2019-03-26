@@ -13,10 +13,10 @@
     <div class="content">
         <div class="chirper">
 
-            <h2 class="titlebar">Pesho</h2>
+            <h2 class="titlebar">New chirp</h2>
 
-            <form id="formSubmitChirp" action="" class="chirp-form" method="post">
-                <textarea name="chirp[content]" class="chirp-input"></textarea>
+            <form id="formSubmitChirp" th:action="@{/chirp/create}" class="chirp-form" th:method="post">
+                <textarea name="content" class="chirp-input"></textarea>
                 <input class="chirp-submit" id="btnSubmitChirp" value="Publish" type="submit">
             </form>
 
@@ -25,9 +25,24 @@
             </div>
         </div>
         <div id="myChirps" class="chirps">
-            <h2 class="titlebar">Chirps</h2>
-            <div class="chirp"><span class="loading">No chirps in database</span></div>
+            <h2 class="titlebar">My Chirps</h2>
+            <article class="chirp" th:each="chirp : ${myChirps}">
+                <div class="titlebar">
+                    <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
+                    <span class="chirp-time">
+                        <!--<a th:href="@{/like}">Likes: |</a>-->
+                        <a th:href="@{/chirp/edit/{id}(id = ${chirp.id})}"><i class="fas fa-edit"></i></a> |
+                        <a th:href="@{/chirp/delete/{id}(id = ${chirp.id})}"><i class="fas fa-trash"></i></a> |
+                        <th:block th:text="${chirp.dateAdded}"/>
+                    </span>
+                </div>
+                <p th:text="*{chirp.content}"</p>
+            </article>
+
+            <!--<div class="chirp"><span class="loading">No chirps in database</span></div>-->
         </div>
+
+
     </div>
 
     <footer><p>Chirper &copy; 2019</p></footer>
