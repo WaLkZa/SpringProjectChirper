@@ -25,7 +25,7 @@ public class User extends BaseEntity implements UserDetails {
 
     private Set<Chirp> chirps;
 
-//    private Integer chirpsCounter;
+    private Integer chirpsCounter = 0;
 
     public User() {
     }
@@ -112,12 +112,22 @@ public class User extends BaseEntity implements UserDetails {
         this.chirps = chirps;
     }
 
-//    @Column(name = "chirps_counter", nullable = false, columnDefinition = "int default 0")
-//    public Integer getChirpsCounter() {
-//        return chirpsCounter;
-//    }
-//
-//    public void setChirpsCounter(Integer chirpsCounter) {
-//        this.chirpsCounter = chirpsCounter;
-//    }
+    @Column(name = "chirps_counter", nullable = false, columnDefinition = "int default 0")
+    public Integer getChirpsCounter() {
+        return chirpsCounter;
+    }
+
+    public void setChirpsCounter(Integer chirpsCounter) {
+        this.chirpsCounter = chirpsCounter;
+    }
+
+    @Transient
+    public void incrementChirpsCounter() {
+        this.chirpsCounter++;
+    }
+
+    @Transient
+    public void decrementChirpsCounter() {
+        this.chirpsCounter--;
+    }
 }

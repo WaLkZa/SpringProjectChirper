@@ -94,6 +94,7 @@ public class HomeController extends BaseController {
         List<Chirp> myChirps = this.chirpRepository.findAllByAuthorId(author.getId());
 
         modelAndView.addObject("myChirps", myChirps);
+        modelAndView.addObject("author", author);
 
         return this.view("profile", modelAndView);
     }

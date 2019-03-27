@@ -15,7 +15,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
@@ -42,14 +41,16 @@ public class ChirpController extends BaseController {
                 .getAuthentication()
                 .getPrincipal();
 
-        Optional<User> author = this.userRepository.findByUsername(userDetails.getUsername());
+        User author = this.userRepository.findByUsername(userDetails.getUsername()).get();
+        author.incrementChirpsCounter();
 
         Chirp chirp = new Chirp(
                 chirpCreateBindingModel.getContent(),
                 LocalDateTime.now(),
-                author.get());
+                author);
 
         this.chirpRepository.saveAndFlush(chirp);
+        this.userRepository.saveAndFlush(author);
 
         return this.redirect("/profile");
     }
@@ -91,6 +92,15 @@ public class ChirpController extends BaseController {
         if (!this.chirpRepository.existsById(id)) {
             return redirect("/profile");
         }
+
+        UserDetails userDetails = (UserDetails) SecurityContextHolder
+                .getContext()
+                .getAuthentication()
+                .getPrincipal();
+
+        User author = this.userRepository.findByUsername(userDetails.getUsername()).get();
+        author.decrementChirpsCounter();
+        this.userRepository.saveAndFlush(author);
 
         this.chirpRepository.deleteById(id);
 

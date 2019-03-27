@@ -6,14 +6,14 @@
 </head>
 <body>
 <div id="main">
-    <header><span>Chirper</span></header>
+    <th:block th:replace="fragments/header"></th:block>
 
     <div class="content">
         <form id="formLogin" class="form chirps" th:action="@{/login}" th:method="POST">
             <label>Username</label>
-            <input name="username" type="text">
+            <input name="username" type="text" th:value="test">
             <label>Password</label>
-            <input name="password" type="password">
+            <input name="password" type="password" th:value="test">
             <label for="rememberMe">Remember Me</label>
             <input type="checkbox" id="rememberMe" name="rememberMe">
             <input id="btnLogin" value="Sign In" type="submit">
@@ -21,7 +21,7 @@
         </form>
     </div>
 
-    <footer><p>Chirper &copy; 2019</p></footer>
+    <th:block th:replace="fragments/footer"></th:block>
 </div>
 </body>
 </html>
