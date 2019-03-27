@@ -18,8 +18,10 @@
                     <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
                     <span class="chirp-time">
                         <!--<a th:href="@{/like}">Likes: |</a>-->
-                        <a th:href="@{/chirp/edit}"><i class="fas fa-edit"></i></a> |
-                        <a th:href="@{/chirp/delete}"><i class="fas fa-trash"></i></a> |
+                        <th:block th:if="${user.isAuthor(chirp)}">
+                            <a th:href="@{/chirp/edit/{id}(id = ${chirp.id})}"><i class="fas fa-edit"></i></a> |
+                            <a th:href="@{/chirp/delete/{id}(id = ${chirp.id})}"><i class="fas fa-trash"></i></a> |
+                        </th:block>
                         <th:block th:text="${chirp.dateAdded}"/>
                     </span>
                 </div>

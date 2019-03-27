@@ -26,7 +26,7 @@
         </div>
         <div id="myChirps" class="chirps">
             <h2 class="titlebar">My Chirps</h2>
-            <article class="chirp" th:each="chirp : ${myChirps}">
+            <article class="chirp" th:each="chirp : ${author.chirps}">
                 <div class="titlebar">
                     <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
                     <span class="chirp-time">

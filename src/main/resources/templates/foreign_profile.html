@@ -18,16 +18,21 @@
             <a id="btnFollow" class="chirp-author" href="#">Follow</a>
 
             <div id="userProfileStats" class="user-details">
-                <span>1 chirps</span> | <span>0 following</span> | <span>2 followers</span>
+                <span th:text="${user.chirpsCounter + ' chirps'}"></span> | <span>0 following</span> | <span>2 followers</span>
             </div>
         </div>
-        <div id="profileChirps" class="chirps"><h2 class="titlebar">Chirps</h2>
-            <article class="chirp">
+        <div id="profileChirps" class="chirps"><h2 class="titlebar" th:text="${user.username + 's chirps'}"></h2>
+            <article class="chirp" th:each="chirp : ${user.chirps}">
                 <div class="titlebar">
-                    <a href="#" class="chirp-author">SoftUni</a>
-                    <span class="chirp-time">1 day</span>
+                    <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
+                    <span class="chirp-time">
+                        <!--<a th:href="@{/like}">Likes: |</a>-->
+                        <a th:href="@{/chirp/edit/{id}(id = ${chirp.id})}"><i class="fas fa-edit"></i></a> |
+                        <a th:href="@{/chirp/delete/{id}(id = ${chirp.id})}"><i class="fas fa-trash"></i></a> |
+                        <th:block th:text="${chirp.dateAdded}"/>
+                    </span>
                 </div>
-                <p>First place at OIB startup weekend!</p>
+                <p th:text="*{chirp.content}"</p>
             </article>
         </div>
     </div>

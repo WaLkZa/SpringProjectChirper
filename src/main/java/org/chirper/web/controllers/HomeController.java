@@ -18,7 +18,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -42,9 +41,9 @@ public class HomeController extends BaseController {
         HttpSession session = (HttpSession) sessionArg.getAttribute("username");
 
         if (session != null) {
-            return this.redirect("feed");
+            return super.redirect("feed");
         } else {
-            return this.redirect("login");
+            return super.redirect("login");
         }
     }
 
@@ -52,16 +51,19 @@ public class HomeController extends BaseController {
     public ModelAndView home(Authentication authentication, ModelAndView modelAndView) {
         modelAndView.addObject("loggedUsername", authentication.getName());
 
-        List<Chirp> allChirps = this.chirpRepository.findAll();
+        User user = this.userService.getCurrentLoggedUser();
+
+        List<Chirp> allChirps = this.chirpRepository.findAllByOrderByDateAddedDesc();
 
         modelAndView.addObject("allChirps", allChirps);
+        modelAndView.addObject("user", user);
 
 //        if (this.getPrincipalAuthority(authentication) != null
 //                && this.getPrincipalAuthority(authentication).equals("ADMIN")){
 //            return this.view("admin-home", modelAndView);
 //        }
 
-        return this.view("feed", modelAndView);
+        return super.view("feed", modelAndView);
     }
 
     @GetMapping("/discover")
@@ -77,26 +79,18 @@ public class HomeController extends BaseController {
 
         modelAndView.addObject("allUsers", allUsersViewModel);
 
-        return this.view("discover", modelAndView);
+        return super.view("discover", modelAndView);
     }
 
     @GetMapping("/profile")
     public ModelAndView profile(Authentication authentication, ModelAndView modelAndView) {
         modelAndView.addObject("loggedUsername", authentication.getName());
 
-        UserDetails userDetails = (UserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+        User author = this.userService.getCurrentLoggedUser();
 
-        User author = (User) this.userService.loadUserByUsername(userDetails.getUsername());
-
-        List<Chirp> myChirps = this.chirpRepository.findAllByAuthorId(author.getId());
-
-        modelAndView.addObject("myChirps", myChirps);
         modelAndView.addObject("author", author);
 
-        return this.view("profile", modelAndView);
+        return super.view("profile", modelAndView);
     }
 
     @GetMapping("/profile/{usernameArg}")
@@ -105,15 +99,14 @@ public class HomeController extends BaseController {
                                 ModelAndView modelAndView) {
         modelAndView.addObject("loggedUsername", authentication.getName());
 
-
         UserDetails user = this.userService.loadUserByUsername(usernameArg);
 
-        ForeignUserProfileViewModel foreignUserProfileViewModel =
-                this.modelMapper.map(user, ForeignUserProfileViewModel.class);
+        //BUG: with view model, chirps are not sorted properly when refreshing page
+//        ForeignUserProfileViewModel foreignUserProfileViewModel =
+//                this.modelMapper.map(user, ForeignUserProfileViewModel.class);
 
-        modelAndView.addObject("user", foreignUserProfileViewModel);
+        modelAndView.addObject("user", user);
 
-
-        return this.view("foreign_profile", modelAndView);
+        return super.view("foreign_profile", modelAndView);
     }
 }

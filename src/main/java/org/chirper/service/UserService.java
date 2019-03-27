@@ -11,6 +11,8 @@ import java.util.Set;
 public interface UserService extends UserDetailsService {
     boolean createUser(UserServiceModel userServiceModel);
 
+    User getCurrentLoggedUser();
+
     Set<UserServiceModel> getAll();
 
     boolean promoteUser(String id);

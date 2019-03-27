@@ -3,6 +3,8 @@ package org.chirper.domain.entities;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -104,6 +106,7 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     @OneToMany(targetEntity = Chirp.class, mappedBy = "author")
+    @OrderBy(value = "dateAdded DESC")
     public Set<Chirp> getChirps() {
         return chirps;
     }
@@ -129,5 +132,10 @@ public class User extends BaseEntity implements UserDetails {
     @Transient
     public void decrementChirpsCounter() {
         this.chirpsCounter--;
+    }
+
+    @Transient
+    public boolean isAuthor(Chirp chirp) {
+        return Objects.equals(this.getId(), chirp.getAuthor().getId());
     }
 }

@@ -6,11 +6,10 @@ import org.chirper.domain.models.binding.ChirpCreateBindingModel;
 import org.chirper.domain.models.binding.ChirpEditBindingModel;
 import org.chirper.repository.ChirpRepository;
 import org.chirper.repository.UserRepository;
+import org.chirper.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,30 +17,26 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Controller
 public class ChirpController extends BaseController {
+    private final UserService userService;
 
     private final UserRepository userRepository;
 
     private final ChirpRepository chirpRepository;
 
     @Autowired
-    public ChirpController(UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper) {
+    public ChirpController(UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper, UserService userService) {
         this.userRepository = userRepository;
         this.chirpRepository = chirpRepository;
+        this.userService = userService;
     }
-
 
     @PostMapping("/chirp/create")
     public ModelAndView createChirpConfirm(ChirpCreateBindingModel chirpCreateBindingModel) {
-        UserDetails userDetails = (UserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
 
-        User author = this.userRepository.findByUsername(userDetails.getUsername()).get();
+        User author = this.userService.getCurrentLoggedUser();
         author.incrementChirpsCounter();
 
         Chirp chirp = new Chirp(
@@ -52,7 +47,7 @@ public class ChirpController extends BaseController {
         this.chirpRepository.saveAndFlush(chirp);
         this.userRepository.saveAndFlush(author);
 
-        return this.redirect("/profile");
+        return super.redirect("/profile");
     }
 
     @GetMapping("/chirp/edit/{id}")
@@ -61,15 +56,20 @@ public class ChirpController extends BaseController {
                                   ModelAndView modelAndView) {
 
         if (!this.chirpRepository.existsById(id)) {
-            return redirect("/profile");
+            return super.redirect("/profile");
         }
 
-        Optional<Chirp> chirp = this.chirpRepository.findById(id);
+        User author = this.userService.getCurrentLoggedUser();
+        Chirp chirp = this.chirpRepository.findById(id).get();
+
+        if (!author.isAuthor(chirp)) {
+            return super.redirect("/profile");
+        }
 
         modelAndView.addObject("loggedUsername", authentication.getName());
         modelAndView.addObject("chirp", chirp);
 
-        return this.view("chirp/edit", modelAndView);
+        return super.view("chirp/edit", modelAndView);
     }
 
     @PostMapping("/chirp/edit/{id}")
@@ -77,33 +77,39 @@ public class ChirpController extends BaseController {
                                          ChirpEditBindingModel chirpEditBindingModel,
                                   ModelAndView modelAndView) {
 
+        User author = this.userService.getCurrentLoggedUser();
         Chirp chirp = this.chirpRepository.findById(id).get();
+
+        if (!author.isAuthor(chirp)) {
+            return super.redirect("/profile");
+        }
 
         chirp.setContent(chirpEditBindingModel.getContent());
         chirp.setDateAdded(LocalDateTime.now());
 
         this.chirpRepository.saveAndFlush(chirp);
 
-        return redirect(id);
+        return super.redirect(id);
     }
 
     @GetMapping("/chirp/delete/{id}")
     public ModelAndView deleteChirpConfirm(@PathVariable(name = "id") String id) {
         if (!this.chirpRepository.existsById(id)) {
-            return redirect("/profile");
+            return super.redirect("/profile");
         }
 
-        UserDetails userDetails = (UserDetails) SecurityContextHolder
-                .getContext()
-                .getAuthentication()
-                .getPrincipal();
+        User author = this.userService.getCurrentLoggedUser();
+        Chirp chirp = this.chirpRepository.findById(id).get();
 
-        User author = this.userRepository.findByUsername(userDetails.getUsername()).get();
+        if (!author.isAuthor(chirp)) {
+            return super.redirect("/profile");
+        }
+
         author.decrementChirpsCounter();
         this.userRepository.saveAndFlush(author);
 
         this.chirpRepository.deleteById(id);
 
-        return this.redirect("/profile");
+        return super.redirect("/profile");
     }
 }
