@@ -15,10 +15,11 @@
 
             <h2 class="titlebar" th:text="*{user.username}"></h2>
 
-            <a id="btnFollow" class="chirp-author" href="#">Follow</a>
+            <a th:if="${currentLoggedUser.isUserFollowed(user)}" th:href="@{/unfollow/{id}(id = ${user.id})}" id="btnFollow" class="chirp-author">Unfollow</a>
+            <a th:unless="${currentLoggedUser.isUserFollowed(user)}" th:href="@{/follow/{id}(id = ${user.id})}" id="btnFollow" class="chirp-author">Follow</a>
 
             <div id="userProfileStats" class="user-details">
-                <span th:text="${user.chirpsCounter + ' chirps'}"></span> | <span>0 following</span> | <span>2 followers</span>
+                <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a th:href="@{/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a th:href="@{/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
             </div>
         </div>
         <div id="profileChirps" class="chirps"><h2 class="titlebar" th:text="${user.username + 's chirps'}"></h2>
@@ -27,8 +28,10 @@
                     <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
                     <span class="chirp-time">
                         <!--<a th:href="@{/like}">Likes: |</a>-->
-                        <a th:href="@{/chirp/edit/{id}(id = ${chirp.id})}"><i class="fas fa-edit"></i></a> |
-                        <a th:href="@{/chirp/delete/{id}(id = ${chirp.id})}"><i class="fas fa-trash"></i></a> |
+                        <th:block th:if="${currentLoggedUser.isAuthor(chirp)}">
+                            <a th:href="@{/chirp/edit/{id}(id = ${chirp.id})}"><i class="fas fa-edit"></i></a> |
+                            <a th:href="@{/chirp/delete/{id}(id = ${chirp.id})}"><i class="fas fa-trash"></i></a> |
+                        </th:block>
                         <th:block th:text="${chirp.dateAdded}"/>
                     </span>
                 </div>

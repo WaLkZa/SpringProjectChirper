@@ -53,7 +53,7 @@ public class HomeController extends BaseController {
 
         User user = this.userService.getCurrentLoggedUser();
 
-        List<Chirp> allChirps = this.chirpRepository.findAllByOrderByDateAddedDesc();
+        List<Chirp> allChirps = this.chirpRepository.findAllByFollowedUsers(user.getId());
 
         modelAndView.addObject("allChirps", allChirps);
         modelAndView.addObject("user", user);
@@ -86,9 +86,9 @@ public class HomeController extends BaseController {
     public ModelAndView profile(Authentication authentication, ModelAndView modelAndView) {
         modelAndView.addObject("loggedUsername", authentication.getName());
 
-        User author = this.userService.getCurrentLoggedUser();
+        User user = this.userService.getCurrentLoggedUser();
 
-        modelAndView.addObject("author", author);
+        modelAndView.addObject("user", user);
 
         return super.view("profile", modelAndView);
     }
@@ -99,13 +99,20 @@ public class HomeController extends BaseController {
                                 ModelAndView modelAndView) {
         modelAndView.addObject("loggedUsername", authentication.getName());
 
-        UserDetails user = this.userService.loadUserByUsername(usernameArg);
+        User user = (User) this.userService.loadUserByUsername(usernameArg);
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+
+        modelAndView.addObject("user", user);
+
+        if (currentLoggedUser.getId().equals(user.getId())) {
+            return super.view("profile", modelAndView);
+        }
 
         //BUG: with view model, chirps are not sorted properly when refreshing page
 //        ForeignUserProfileViewModel foreignUserProfileViewModel =
 //                this.modelMapper.map(user, ForeignUserProfileViewModel.class);
 
-        modelAndView.addObject("user", user);
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("foreign_profile", modelAndView);
     }

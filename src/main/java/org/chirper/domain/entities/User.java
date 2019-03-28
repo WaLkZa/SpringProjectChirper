@@ -27,9 +27,13 @@ public class User extends BaseEntity implements UserDetails {
 
     private Set<Chirp> chirps;
 
-    private Integer chirpsCounter = 0;
+    private Set<User> followers;
+
+    private Set<User> following;
 
     public User() {
+        this.followers = new HashSet<>();
+        this.following = new HashSet<>();
     }
 
     @Override
@@ -115,23 +119,65 @@ public class User extends BaseEntity implements UserDetails {
         this.chirps = chirps;
     }
 
-    @Column(name = "chirps_counter", nullable = false, columnDefinition = "int default 0")
-    public Integer getChirpsCounter() {
-        return chirpsCounter;
+    @Transient
+    public int getChirpsCounter() {
+        return this.chirps.size();
     }
 
-    public void setChirpsCounter(Integer chirpsCounter) {
-        this.chirpsCounter = chirpsCounter;
+    @ManyToMany(mappedBy = "following")
+    public Set<User> getFollowers() {
+        return followers;
+    }
+
+    public void setFollowers(Set<User> followers) {
+        this.followers = followers;
     }
 
     @Transient
-    public void incrementChirpsCounter() {
-        this.chirpsCounter++;
+    public void setFollower(User follower) {
+        this.followers.add(follower);
     }
 
     @Transient
-    public void decrementChirpsCounter() {
-        this.chirpsCounter--;
+    public void removeFollower(User follower) {
+        this.followers.remove(follower);
+    }
+
+    @ManyToMany(cascade = {CascadeType.ALL})
+    @JoinTable(name = "followers",
+            joinColumns = @JoinColumn(name = "follower_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "followed_id", referencedColumnName = "id"))
+    public Set<User> getFollowing() {
+        return following;
+    }
+
+    public void setFollowing(Set<User> following) {
+        this.following = following;
+    }
+
+    @Transient
+    public void setFollowing(User following) {
+        this.following.add(following);
+    }
+
+    @Transient
+    public void removeFollowing(User following) {
+        this.following.remove(following);
+    }
+
+    @Transient
+    public int getFollowingCounter() {
+        return this.following.size();
+    }
+
+    @Transient
+    public int getFollowersCounter() {
+        return this.followers.size();
+    }
+
+    @Transient
+    public boolean isUserFollowed(User user) {
+        return this.following.contains(user);
     }
 
     @Transient

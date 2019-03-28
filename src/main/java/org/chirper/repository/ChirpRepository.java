@@ -11,19 +11,15 @@ import java.util.List;
 
 @Repository
 public interface ChirpRepository extends JpaRepository<Chirp, String> {
-//    @Query(value = "SELECT * FROM chirps AS c WHERE c.author_id = ?1 ORDER BY c.date_added DESC", nativeQuery = true)
-//    List<Chirp> findAllByAuthorId(String userId);
-
     List<Chirp> findAllByAuthorOrderByDateAddedDesc(User user);
 
     List<Chirp> findAllByOrderByDateAddedDesc();
 
-//    @Query(value = "SELECT * FROM chirps AS c ORDER BY c.date_added DESC", nativeQuery = true)
-//    List<Chirp> findAllChirps();
-
-//    @Query("SELECT c FROM Chirp c WHERE c.author = :authorId ORDER BY c.dateAdded DESC")
-//    List<Chirp> findAllByAuthorId(@Param("authorId") String authorId);
-
-//    @Query("SELECT p FROM Post p LEFT JOIN FETCH p.author ORDER BY p.date DESC")
-//    List<Post> findLatest5Posts(Pageable pageable);
+    @Query(value = "SELECT c.*, u2.username FROM users AS u " +
+            "INNER JOIN followers AS f ON f.follower_id = u.id " +
+            "INNER JOIN users as u2 ON u2.id = f.followed_id " +
+            "INNER JOIN chirps AS c ON c.author_id = u2.id " +
+            "WHERE u.id = ?1 " +
+            "ORDER BY c.date_added DESC", nativeQuery = true)
+    List<Chirp> findAllByFollowedUsers(String currentUserId);
 }

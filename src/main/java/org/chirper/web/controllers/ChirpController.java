@@ -37,7 +37,6 @@ public class ChirpController extends BaseController {
     public ModelAndView createChirpConfirm(ChirpCreateBindingModel chirpCreateBindingModel) {
 
         User author = this.userService.getCurrentLoggedUser();
-        author.incrementChirpsCounter();
 
         Chirp chirp = new Chirp(
                 chirpCreateBindingModel.getContent(),
@@ -105,7 +104,6 @@ public class ChirpController extends BaseController {
             return super.redirect("/profile");
         }
 
-        author.decrementChirpsCounter();
         this.userRepository.saveAndFlush(author);
 
         this.chirpRepository.deleteById(id);

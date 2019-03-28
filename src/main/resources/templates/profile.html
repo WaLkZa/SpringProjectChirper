@@ -21,12 +21,12 @@
             </form>
 
             <div id="myStats" class="user-details">
-                <span th:text="${author.chirpsCounter + ' chirps'}"></span> | <span>1 following</span> | <span>0 followers</span>
+                <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a th:href="@{/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a th:href="@{/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
             </div>
         </div>
         <div id="myChirps" class="chirps">
             <h2 class="titlebar">My Chirps</h2>
-            <article class="chirp" th:each="chirp : ${author.chirps}">
+            <article class="chirp" th:each="chirp : ${user.chirps}">
                 <div class="titlebar">
                     <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
                     <span class="chirp-time">
