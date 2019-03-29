@@ -30,8 +30,8 @@ public class SubscribeController extends BaseController {
 
         User toFollowUser = this.userRepository.findById(toFollowId).get();
         User currentLoggedUser = this.userService.getCurrentLoggedUser();
-        currentLoggedUser.setFollowing(toFollowUser);
-        toFollowUser.setFollower(currentLoggedUser);
+        currentLoggedUser.addFollowing(toFollowUser);
+        toFollowUser.addFollower(currentLoggedUser);
 
         this.userRepository.saveAndFlush(currentLoggedUser);
         this.userRepository.saveAndFlush(toFollowUser);

@@ -3,9 +3,7 @@ package org.chirper.domain.entities;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "users")
@@ -31,9 +29,12 @@ public class User extends BaseEntity implements UserDetails {
 
     private Set<User> following;
 
+    private List<Chirp> chirpLikes;
+
     public User() {
         this.followers = new HashSet<>();
         this.following = new HashSet<>();
+        this.chirpLikes = new ArrayList<>();
     }
 
     @Override
@@ -134,7 +135,7 @@ public class User extends BaseEntity implements UserDetails {
     }
 
     @Transient
-    public void setFollower(User follower) {
+    public void addFollower(User follower) {
         this.followers.add(follower);
     }
 
@@ -155,8 +156,30 @@ public class User extends BaseEntity implements UserDetails {
         this.following = following;
     }
 
+    @ManyToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "likes",
+            joinColumns = @JoinColumn(name = "user_id", referencedColumnName = "id"),
+            inverseJoinColumns = @JoinColumn(name = "chirp_id", referencedColumnName = "id"))
+    public List<Chirp> getChirpLikes() {
+        return chirpLikes;
+    }
+
+    public void setChirpLikes(List<Chirp> chirpLikes) {
+        this.chirpLikes = chirpLikes;
+    }
+
     @Transient
-    public void setFollowing(User following) {
+    public void addChirpLike(Chirp chirp) {
+        this.chirpLikes.add(chirp);
+    }
+
+    @Transient
+    public void removeChirpLike(Chirp chirp) {
+        this.chirpLikes.remove(chirp);
+    }
+
+    @Transient
+    public void addFollowing(User following) {
         this.following.add(following);
     }
 
@@ -178,6 +201,11 @@ public class User extends BaseEntity implements UserDetails {
     @Transient
     public boolean isUserFollowed(User user) {
         return this.following.contains(user);
+    }
+
+    @Transient
+    public boolean isChirpLikeExist(Chirp chirp) {
+        return this.chirpLikes.contains(chirp);
     }
 
     @Transient

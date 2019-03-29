@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/head"></th:block>
+</head>
+<body>
+<div id="main">
+    <th:block th:replace="fragments/header"></th:block>
+
+    <th:block th:replace="fragments/navbar"></th:block>
+
+    <div class="content">
+        <div class="chirps">
+            <h2 class="titlebar">Likes</h2>
+            <div id="userlist">
+                <div class="userbox" th:each="user : ${likesUsers}">
+                    <div><a th:href="@{'/profile/' + ${user.username}}" class="chirp-author" th:text="*{user.username}"></a></div>
+                </div>
+                <div class="userbox" th:if="${#lists.isEmpty(likesUsers)}">
+                    No likes
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <th:block th:replace="fragments/footer"></th:block>
+</div>
+</body>
+</html>
