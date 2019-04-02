@@ -1,9 +1,13 @@
 package org.chirper.domain.entities;
 
+import org.ocpsoft.prettytime.PrettyTime;
+
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.sql.Timestamp.*;
 
 @Entity
 @Table(name="chirps")
@@ -67,5 +71,11 @@ public class Chirp extends BaseEntity {
     @Transient
     public int getUserLikesCounter() {
         return this.userLikes.size();
+    }
+
+    @Transient
+    public String getTimeAgo() {
+        PrettyTime prettyTime = new PrettyTime();
+        return prettyTime.format(valueOf(this.dateAdded));
     }
 }
