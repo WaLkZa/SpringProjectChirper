@@ -38,6 +38,9 @@
                 </div>
                 <p th:text="*{chirp.content}"</p>
             </article>
+            <div class="chirp" th:if="${#lists.isEmpty(user.chirps)}">
+                <span class="loading">The user does not have any chirps!</span>
+            </div>
         </div>
     </div>
 

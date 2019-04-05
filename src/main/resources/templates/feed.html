@@ -12,7 +12,7 @@
 
     <div class="content">
         <div id="chirps" class="chirps">
-            <h2 class="titlebar">Chirps from all followed users</h2>
+            <h2 class="titlebar">Chirps from all following users</h2>
             <article class="chirp" th:each="chirp : ${allChirps}">
                 <div class="titlebar">
                     <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
@@ -28,6 +28,9 @@
                 </div>
                 <p th:text="*{chirp.content}"</p>
             </article>
+            <div class="chirp" th:if="${#lists.isEmpty(allChirps)}">
+                <span class="loading">No chirps in feed. Try to follow user(s) with chirps.</span>
+            </div>
         </div>
     </div>
 

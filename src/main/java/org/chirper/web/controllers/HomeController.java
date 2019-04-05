@@ -2,15 +2,10 @@ package org.chirper.web.controllers;
 
 import org.chirper.domain.entities.Chirp;
 import org.chirper.domain.entities.User;
-import org.chirper.domain.models.view.AllUsersViewModel;
-import org.chirper.domain.models.view.ForeignUserProfileViewModel;
-import org.chirper.repository.ChirpRepository;
+import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,22 +13,17 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @Controller
 public class HomeController extends BaseController {
     private final UserService userService;
 
-    private final ChirpRepository chirpRepository;
-
-    private final ModelMapper modelMapper;
+    private final ChirpService chirpService;
 
     @Autowired
-    public HomeController(UserService userService, ChirpRepository chirpRepository, ModelMapper modelMapper) {
+    public HomeController(UserService userService, ChirpService chirpService) {
         this.userService = userService;
-        this.chirpRepository = chirpRepository;
-        this.modelMapper = modelMapper;
+        this.chirpService = chirpService;
     }
 
     @GetMapping("/")
@@ -53,7 +43,7 @@ public class HomeController extends BaseController {
 
         User user = this.userService.getCurrentLoggedUser();
 
-        List<Chirp> allChirps = this.chirpRepository.findAllByFollowedUsers(user.getId());
+        List<Chirp> allChirps = this.chirpService.getAllByFollowingUsers(user.getId());
 
         modelAndView.addObject("allChirps", allChirps);
         modelAndView.addObject("user", user);
@@ -70,14 +60,9 @@ public class HomeController extends BaseController {
     public ModelAndView discover(Authentication authentication, ModelAndView modelAndView) {
         modelAndView.addObject("loggedUsername", authentication.getName());
 
-        Set<AllUsersViewModel> allUsersViewModel = this
-                .userService
-                .getAll()
-                .stream()
-                .map(x -> this.modelMapper.map(x, AllUsersViewModel.class))
-                .collect(Collectors.toUnmodifiableSet());
+        List<User> allUsers = this.userService.getAll();
 
-        modelAndView.addObject("allUsers", allUsersViewModel);
+        modelAndView.addObject("allUsers", allUsers);
 
         return super.view("discover", modelAndView);
     }
@@ -107,10 +92,6 @@ public class HomeController extends BaseController {
         if (currentLoggedUser.getId().equals(user.getId())) {
             return super.view("profile", modelAndView);
         }
-
-        //BUG: with view model, chirps are not sorted properly when refreshing page
-//        ForeignUserProfileViewModel foreignUserProfileViewModel =
-//                this.modelMapper.map(user, ForeignUserProfileViewModel.class);
 
         modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 

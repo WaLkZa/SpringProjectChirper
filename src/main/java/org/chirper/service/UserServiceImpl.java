@@ -2,7 +2,6 @@ package org.chirper.service;
 
 import org.chirper.domain.entities.User;
 import org.chirper.domain.entities.UserRole;
-import org.chirper.domain.models.service.UserServiceModel;
 import org.chirper.repository.RoleRepository;
 import org.chirper.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -14,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.Optional;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -62,9 +61,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean createUser(UserServiceModel userServiceModel) {
-        User userEntity = this.modelMapper.map(userServiceModel, User.class);
-
+    public boolean createUser(User userEntity) {
         userEntity.setPassword(this.bCryptPasswordEncoder.encode(userEntity.getPassword()));
 
         if (this.userRepository.findAll().isEmpty()) {
@@ -84,12 +81,8 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public Set<UserServiceModel> getAll() {
-        return this.userRepository
-                .findAll()
-                .stream()
-                .map(x -> this.modelMapper.map(x, UserServiceModel.class))
-                .collect(Collectors.toUnmodifiableSet());
+    public List<User> getAll() {
+        return this.userRepository.findAll();
     }
 
     @Override
@@ -167,5 +160,45 @@ public class UserServiceImpl implements UserService {
                 .getPrincipal();
 
         return (User) loadUserByUsername(userDetails.getUsername());
+    }
+
+    @Override
+    public void followUser(String toFollowId) {
+        User toFollowUser = this.userRepository.findById(toFollowId).get();
+        User currentLoggedUser = this.getCurrentLoggedUser();
+        currentLoggedUser.addFollowing(toFollowUser);
+        toFollowUser.addFollower(currentLoggedUser);
+
+        this.userRepository.saveAndFlush(currentLoggedUser);
+        this.userRepository.saveAndFlush(toFollowUser);
+    }
+
+    @Override
+    public void unfollowUser(String followedId) {
+        User followedUser = this.userRepository.findById(followedId).get();
+        User currentLoggedUser = this.getCurrentLoggedUser();
+        currentLoggedUser.removeFollowing(followedUser);
+        followedUser.removeFollower(currentLoggedUser);
+
+        this.userRepository.saveAndFlush(currentLoggedUser);
+        this.userRepository.saveAndFlush(followedUser);
+    }
+
+    @Override
+    public List<User> getUserAllFollowers(String userId) {
+        User currentLoggedUser = this.getCurrentLoggedUser();
+
+        List<User> allFollowers = currentLoggedUser.getFollowers();
+
+        return allFollowers;
+    }
+
+    @Override
+    public List<User> getUserAllFollowing(String userId) {
+        User currentLoggedUser = this.getCurrentLoggedUser();
+
+        List<User> allFollowing =  currentLoggedUser.getFollowing();
+
+        return allFollowing;
     }
 }

@@ -23,17 +23,17 @@ public class User extends BaseEntity implements UserDetails {
 
     private Set<UserRole> authorities;
 
-    private Set<Chirp> chirps;
+    private List<Chirp> chirps;
 
-    private Set<User> followers;
+    private List<User> followers;
 
-    private Set<User> following;
+    private List<User> following;
 
     private List<Chirp> chirpLikes;
 
     public User() {
-        this.followers = new HashSet<>();
-        this.following = new HashSet<>();
+        this.followers = new ArrayList<>();
+        this.following = new ArrayList<>();
         this.chirpLikes = new ArrayList<>();
     }
 
@@ -112,47 +112,32 @@ public class User extends BaseEntity implements UserDetails {
 
     @OneToMany(targetEntity = Chirp.class, mappedBy = "author")
     @OrderBy(value = "dateAdded DESC")
-    public Set<Chirp> getChirps() {
+    public List<Chirp> getChirps() {
         return chirps;
     }
 
-    public void setChirps(Set<Chirp> chirps) {
+    public void setChirps(List<Chirp> chirps) {
         this.chirps = chirps;
     }
 
-    @Transient
-    public int getChirpsCounter() {
-        return this.chirps.size();
-    }
-
     @ManyToMany(mappedBy = "following")
-    public Set<User> getFollowers() {
+    public List<User> getFollowers() {
         return followers;
     }
 
-    public void setFollowers(Set<User> followers) {
+    public void setFollowers(List<User> followers) {
         this.followers = followers;
-    }
-
-    @Transient
-    public void addFollower(User follower) {
-        this.followers.add(follower);
-    }
-
-    @Transient
-    public void removeFollower(User follower) {
-        this.followers.remove(follower);
     }
 
     @ManyToMany(cascade = {CascadeType.ALL})
     @JoinTable(name = "followers",
             joinColumns = @JoinColumn(name = "follower_id", referencedColumnName = "id"),
             inverseJoinColumns = @JoinColumn(name = "followed_id", referencedColumnName = "id"))
-    public Set<User> getFollowing() {
+    public List<User> getFollowing() {
         return following;
     }
 
-    public void setFollowing(Set<User> following) {
+    public void setFollowing(List<User> following) {
         this.following = following;
     }
 
@@ -166,6 +151,21 @@ public class User extends BaseEntity implements UserDetails {
 
     public void setChirpLikes(List<Chirp> chirpLikes) {
         this.chirpLikes = chirpLikes;
+    }
+
+    @Transient
+    public int getChirpsCounter() {
+        return this.chirps.size();
+    }
+
+    @Transient
+    public void addFollower(User follower) {
+        this.followers.add(follower);
+    }
+
+    @Transient
+    public void removeFollower(User follower) {
+        this.followers.remove(follower);
     }
 
     @Transient

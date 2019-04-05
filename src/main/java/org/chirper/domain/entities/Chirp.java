@@ -31,7 +31,7 @@ public class Chirp extends BaseEntity {
         this.author = author;
     }
 
-    @Column(name = "content", columnDefinition = "TEXT", nullable = false)
+    @Column(name = "content", columnDefinition = "TEXT", nullable = false, updatable = true)
     public String getContent() {
         return content;
     }
@@ -40,7 +40,7 @@ public class Chirp extends BaseEntity {
         this.content = content;
     }
 
-    @Column(name = "date_added", nullable = false)
+    @Column(name = "date_added", nullable = false, updatable = true)
     public LocalDateTime getDateAdded() {
         return dateAdded;
     }

@@ -1,10 +1,8 @@
 package org.chirper.web.controllers;
 
-import org.chirper.domain.entities.Chirp;
 import org.chirper.domain.entities.User;
-import org.chirper.repository.ChirpRepository;
-import org.chirper.repository.UserRepository;
-import org.chirper.service.UserService;
+import org.chirper.service.ChirpService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,40 +11,22 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Set;
 
 @Controller
 public class LikeController extends BaseController {
 
-    private final UserService userService;
+    private final ChirpService chirpService;
 
-    private final UserRepository userRepository;
-
-    private final ChirpRepository chirpRepository;
-
-    public LikeController(UserService userService, UserRepository userRepository, ChirpRepository chirpRepository) {
-        this.userService = userService;
-        this.userRepository = userRepository;
-        this.chirpRepository = chirpRepository;
+    @Autowired
+    public LikeController(ChirpService chirpService) {
+        this.chirpService = chirpService;
     }
 
     @GetMapping("/chirp/like/{chirpId}")
     public ModelAndView likeAndUnlikeAChirp(@PathVariable(name = "chirpId") String chirpId,
                                    HttpServletRequest request) {
 
-        Chirp currentChirp = this.chirpRepository.findById(chirpId).get();
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
-
-        boolean isChirpLikeExist = currentLoggedUser.isChirpLikeExist(currentChirp);
-
-        if (isChirpLikeExist) {
-            currentLoggedUser.removeChirpLike(currentChirp);
-        } else {
-            currentLoggedUser.addChirpLike(currentChirp);
-        }
-
-        this.userRepository.saveAndFlush(currentLoggedUser);
-        this.chirpRepository.saveAndFlush(currentChirp);
+        this.chirpService.likeAndUnlikeAChirp(chirpId);
 
         return super.redirect(request.getHeader("Referer"));
     }
@@ -56,9 +36,8 @@ public class LikeController extends BaseController {
                                       Authentication authentication, ModelAndView modelAndView) {
         modelAndView.addObject("loggedUsername", authentication.getName());
 
-        Chirp currentChirp = this.chirpRepository.findById(chirpId).get();
+        List<User> likesUsers = this.chirpService.getChirpLikes(chirpId);
 
-        List<User> likesUsers = currentChirp.getUserLikes();
         modelAndView.addObject("likesUsers", likesUsers);
 
         return super.view("chirp/likes", modelAndView);

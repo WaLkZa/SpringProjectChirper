@@ -6,12 +6,14 @@ import org.chirper.domain.models.binding.ChirpCreateBindingModel;
 import org.chirper.domain.models.binding.ChirpEditBindingModel;
 import org.chirper.repository.ChirpRepository;
 import org.chirper.repository.UserRepository;
+import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
@@ -22,29 +24,23 @@ import java.time.LocalDateTime;
 public class ChirpController extends BaseController {
     private final UserService userService;
 
+    private final ChirpService chirpService;
+
     private final UserRepository userRepository;
 
     private final ChirpRepository chirpRepository;
 
     @Autowired
-    public ChirpController(UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper, UserService userService) {
+    public ChirpController(UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper, UserService userService, ChirpService chirpService) {
         this.userRepository = userRepository;
         this.chirpRepository = chirpRepository;
         this.userService = userService;
+        this.chirpService = chirpService;
     }
 
     @PostMapping("/chirp/create")
-    public ModelAndView createChirpConfirm(ChirpCreateBindingModel chirpCreateBindingModel) {
-
-        User author = this.userService.getCurrentLoggedUser();
-
-        Chirp chirp = new Chirp(
-                chirpCreateBindingModel.getContent(),
-                LocalDateTime.now(),
-                author);
-
-        this.chirpRepository.saveAndFlush(chirp);
-        this.userRepository.saveAndFlush(author);
+    public ModelAndView createChirpConfirm(@ModelAttribute ChirpCreateBindingModel chirpCreateBindingModel) {
+        this.chirpService.createChirp(chirpCreateBindingModel);
 
         return super.redirect("/profile");
     }
@@ -73,7 +69,7 @@ public class ChirpController extends BaseController {
 
     @PostMapping("/chirp/edit/{id}")
     public ModelAndView editChirpConfirm(@PathVariable(name = "id") String id,
-                                         ChirpEditBindingModel chirpEditBindingModel,
+                                         @ModelAttribute ChirpEditBindingModel chirpEditBindingModel,
                                   ModelAndView modelAndView) {
 
         User author = this.userService.getCurrentLoggedUser();

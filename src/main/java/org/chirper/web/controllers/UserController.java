@@ -1,7 +1,7 @@
 package org.chirper.web.controllers;
 
+import org.chirper.domain.entities.User;
 import org.chirper.domain.models.binding.UserRegisterBindingModel;
-import org.chirper.domain.models.service.UserServiceModel;
 import org.chirper.service.UserService;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,7 +41,7 @@ public class UserController extends BaseController {
             return this.view("register");
         }
 
-        this.userService.createUser(this.modelMapper.map(userRegisterBindingModel, UserServiceModel.class));
+        this.userService.createUser(this.modelMapper.map(userRegisterBindingModel, User.class));
 
         return this.redirect("/login");
     }
