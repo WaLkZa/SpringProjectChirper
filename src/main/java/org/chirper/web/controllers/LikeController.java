@@ -2,8 +2,8 @@ package org.chirper.web.controllers;
 
 import org.chirper.domain.entities.User;
 import org.chirper.service.ChirpService;
+import org.chirper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,10 +15,13 @@ import java.util.List;
 @Controller
 public class LikeController extends BaseController {
 
+    private final UserService userService;
+
     private final ChirpService chirpService;
 
     @Autowired
-    public LikeController(ChirpService chirpService) {
+    public LikeController(UserService userService, ChirpService chirpService) {
+        this.userService = userService;
         this.chirpService = chirpService;
     }
 
@@ -33,12 +36,14 @@ public class LikeController extends BaseController {
 
     @GetMapping("/chirp/listLikes/{chirpId}")
     public ModelAndView listLikes(@PathVariable(name = "chirpId") String chirpId,
-                                      Authentication authentication, ModelAndView modelAndView) {
-        modelAndView.addObject("loggedUsername", authentication.getName());
+                                      ModelAndView modelAndView) {
+
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
         List<User> likesUsers = this.chirpService.getChirpLikes(chirpId);
 
         modelAndView.addObject("likesUsers", likesUsers);
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("chirp/likes", modelAndView);
     }

@@ -12,9 +12,7 @@ public interface UserService extends UserDetailsService {
 
     List<User> getAll();
 
-    boolean promoteUser(String id);
-
-    boolean demoteUser(String id);
+    void setUserRole(String id, String role);
 
     void followUser(String toFollowId);
 

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/head"></th:block>
+</head>
+<body>
+<div id="main">
+    <th:block th:replace="fragments/header"></th:block>
+
+    <th:block th:replace="fragments/navbar"></th:block>
+
+    <div class="content">
+        <div class="chirps">
+            <h2 class="titlebar-roles">Manage user roles</h2>
+
+            <table id="userlist">
+                <tr>
+                    <th>Username</th>
+                    <th>Roles</th>
+                    <th>Action</th>
+                </tr>
+                <th:block th:each="user, iter : ${users}">
+                    <tr>
+                        <td>
+                            <a th:href="@{'/profile/' + ${user.username}}" class="chirp-author" th:text="*{user.username}"></a>
+                        </td>
+                        <td th:text="${#strings.listJoin(user.authorities, ', ')}" ></td>
+                        <td>
+                            <th:block th:if="${#lists.contains(user.authorities, 'ROLE_USER') &&
+                            !#lists.contains(user.authorities, 'ROLE_ADMIN')
+                        }">
+                                <form th:action="@{/set-admin/{id}(id=${user.id})}" method="post">
+                                    <input type="hidden" name="_csrf"
+                                           value="80417983-fe8b-45c7-963e-31f6915a1560">
+                                    <button id="btnAction" class="chirp-author">ADMIN</button>
+                                </form>
+                            </th:block>
+                            <th:block th:if="${#lists.contains(user.authorities, 'ROLE_USER') &&
+                            #lists.contains(user.authorities, 'ROLE_ADMIN') && !#lists.contains(user.authorities, 'ROLE_ROOT')
+                        }">
+                                <form th:action="@{/set-user/{id}(id=${user.id})}" method="post">
+                                    <input type="hidden" name="_csrf"
+                                           value="80417983-fe8b-45c7-963e-31f6915a1560">
+                                    <button id="btnAction" class="chirp-author">USER</button>
+                                </form>
+                            </th:block>
+                        </td>
+                    </tr>
+                </th:block>
+            </table>
+        </div>
+    </div>
+
+    <th:block th:replace="fragments/footer"></th:block>
+</div>
+</body>
+</html>

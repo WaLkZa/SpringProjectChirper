@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.ModelAndView;
 
+import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 
 @Controller
@@ -57,11 +58,11 @@ public class ChirpController extends BaseController {
         User author = this.userService.getCurrentLoggedUser();
         Chirp chirp = this.chirpRepository.findById(id).get();
 
-        if (!author.isAuthor(chirp)) {
-            return super.redirect("/profile");
-        }
+//        if (!author.isAuthor(chirp)) {
+//            return super.redirect("/profile");
+//        }
 
-        modelAndView.addObject("loggedUsername", authentication.getName());
+        modelAndView.addObject("currentLoggedUser", author);
         modelAndView.addObject("chirp", chirp);
 
         return super.view("chirp/edit", modelAndView);
@@ -69,15 +70,16 @@ public class ChirpController extends BaseController {
 
     @PostMapping("/chirp/edit/{id}")
     public ModelAndView editChirpConfirm(@PathVariable(name = "id") String id,
+                                         Authentication authentication,
                                          @ModelAttribute ChirpEditBindingModel chirpEditBindingModel,
                                   ModelAndView modelAndView) {
 
-        User author = this.userService.getCurrentLoggedUser();
+//        User author = this.userService.getCurrentLoggedUser();
         Chirp chirp = this.chirpRepository.findById(id).get();
 
-        if (!author.isAuthor(chirp)) {
-            return super.redirect("/profile");
-        }
+//        if (!author.isAuthor(chirp)) {
+//            return super.redirect("/profile");
+//        }
 
         chirp.setContent(chirpEditBindingModel.getContent());
         chirp.setDateAdded(LocalDateTime.now());
@@ -88,22 +90,24 @@ public class ChirpController extends BaseController {
     }
 
     @GetMapping("/chirp/delete/{id}")
-    public ModelAndView deleteChirpConfirm(@PathVariable(name = "id") String id) {
+    public ModelAndView deleteChirpConfirm(@PathVariable(name = "id") String id,
+                                           HttpServletRequest request) {
+
         if (!this.chirpRepository.existsById(id)) {
             return super.redirect("/profile");
         }
 
-        User author = this.userService.getCurrentLoggedUser();
-        Chirp chirp = this.chirpRepository.findById(id).get();
+//        User author = this.userService.getCurrentLoggedUser();
+//        Chirp chirp = this.chirpRepository.findById(id).get();
+//
+//        if (!author.isAuthor(chirp)) {
+//            return super.redirect("/profile");
+//        }
 
-        if (!author.isAuthor(chirp)) {
-            return super.redirect("/profile");
-        }
-
-        this.userRepository.saveAndFlush(author);
+//        this.userRepository.saveAndFlush(author);
 
         this.chirpRepository.deleteById(id);
 
-        return super.redirect("/profile");
+        return super.redirect(request.getHeader("Referer"));
     }
 }

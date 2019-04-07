@@ -42,12 +42,14 @@ public class SubscribeController extends BaseController {
 
     @GetMapping("/followersList/{userId}")
     public ModelAndView listFollowers(@PathVariable(name = "userId") String userId,
-                                      Authentication authentication, ModelAndView modelAndView) {
-        modelAndView.addObject("loggedUsername", authentication.getName());
+                                      ModelAndView modelAndView) {
+
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
         List<User> allUsers = this.userService.getUserAllFollowers(userId);
 
         modelAndView.addObject("allUsers", allUsers);
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("discover", modelAndView);
     }
@@ -55,12 +57,14 @@ public class SubscribeController extends BaseController {
 
     @GetMapping("/followingList/{userId}")
     public ModelAndView listFollowing(@PathVariable(name = "userId") String userId,
-                                      Authentication authentication, ModelAndView modelAndView) {
-        modelAndView.addObject("loggedUsername", authentication.getName());
+                                      ModelAndView modelAndView) {
+
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
         List<User> allUsers = this.userService.getUserAllFollowing(userId);
 
         modelAndView.addObject("allUsers", allUsers);
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("discover", modelAndView);
     }

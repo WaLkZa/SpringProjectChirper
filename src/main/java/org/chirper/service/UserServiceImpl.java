@@ -1,7 +1,7 @@
 package org.chirper.service;
 
 import org.chirper.domain.entities.User;
-import org.chirper.domain.entities.UserRole;
+import org.chirper.domain.entities.Role;
 import org.chirper.repository.RoleRepository;
 import org.chirper.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -13,15 +13,17 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final RoleRepository roleRepository;
+
+    private final RoleService roleService;
 
     private final ModelMapper modelMapper;
 
@@ -31,17 +33,18 @@ public class UserServiceImpl implements UserService {
     public UserServiceImpl(
             UserRepository userRepository,
             RoleRepository roleRepository,
-            ModelMapper modelMapper,
+            RoleService roleService, ModelMapper modelMapper,
             BCryptPasswordEncoder bCryptPasswordEncoder
     ) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
+        this.roleService = roleService;
         this.modelMapper = modelMapper;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
 
-    private Set<UserRole> getAuthorities(String authority) {
-        Set<UserRole> userAuthorities = new HashSet<>();
+    private Set<Role> getAuthorities(String authority) {
+        Set<Role> userAuthorities = new LinkedHashSet<>();
 
         userAuthorities.add(this.roleRepository.getByAuthority(authority));
 
@@ -62,12 +65,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean createUser(User userEntity) {
+        this.roleService.seedRolesInDb();
+
         userEntity.setPassword(this.bCryptPasswordEncoder.encode(userEntity.getPassword()));
 
-        if (this.userRepository.findAll().isEmpty()) {
-            userEntity.setAuthorities(this.getAuthorities("ADMIN"));
+        if (this.userRepository.count() == 0) {
+            userEntity.setAuthorities(this.roleService.findAllRoles());
         } else {
-            userEntity.setAuthorities(this.getAuthorities("USER"));
+            userEntity.setAuthorities(this.getAuthorities("ROLE_USER"));
         }
 
         try {
@@ -86,57 +91,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean promoteUser(String id) {
-        User user = this.userRepository
-                .findById(id)
-                .orElse(null);
+    public void setUserRole(String id, String role) {
+        User user = this.userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Incorrect id!"));
 
-        if (user == null) {
-            return false;
+        user.getAuthorities().clear();
+
+        switch (role) {
+            case "user":
+                user.getAuthorities().add(this.roleService.findByAuthority("ROLE_USER"));
+                break;
+            case "admin":
+                user.getAuthorities().add(this.roleService.findByAuthority("ROLE_USER"));
+                user.getAuthorities().add(this.roleService.findByAuthority("ROLE_ADMIN"));
+                break;
         }
 
-        String userAuthority = this.getUserAuthority(user.getId());
-
-        switch (userAuthority) {
-            case "USER":
-                user.setAuthorities(this.getAuthorities("MODERATOR"));
-                break;
-            case "MODERATOR":
-                user.setAuthorities(this.getAuthorities("ADMIN"));
-                break;
-            default:
-                throw new IllegalArgumentException("There is no role, higher than ADMIN");
-        }
-
-        this.userRepository.save(user);
-        return true;
-    }
-
-    @Override
-    public boolean demoteUser(String id) {
-        User user = this.userRepository
-                .findById(id)
-                .orElse(null);
-
-        if (user == null) {
-            return false;
-        }
-
-        String userAuthority = this.getUserAuthority(user.getId());
-
-        switch (userAuthority) {
-            case "ADMIN":
-                user.setAuthorities(this.getAuthorities("MODERATOR"));
-                break;
-            case "MODERATOR":
-                user.setAuthorities(this.getAuthorities("USER"));
-                break;
-            default:
-                throw new IllegalArgumentException("There is no role, lower than USER");
-        }
-
-        this.userRepository.save(user);
-        return true;
+        this.userRepository.saveAndFlush(user);
     }
 
     @Override
@@ -197,7 +168,7 @@ public class UserServiceImpl implements UserService {
     public List<User> getUserAllFollowing(String userId) {
         User currentLoggedUser = this.getCurrentLoggedUser();
 
-        List<User> allFollowing =  currentLoggedUser.getFollowing();
+        List<User> allFollowing = currentLoggedUser.getFollowing();
 
         return allFollowing;
     }

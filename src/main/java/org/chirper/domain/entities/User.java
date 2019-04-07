@@ -21,7 +21,7 @@ public class User extends BaseEntity implements UserDetails {
 
     private boolean isEnabled;
 
-    private Set<UserRole> authorities;
+    private Set<Role> authorities;
 
     private List<Chirp> chirps;
 
@@ -59,18 +59,18 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     @ManyToMany(cascade = CascadeType.ALL
-            , targetEntity = UserRole.class
+            , targetEntity = Role.class
             , fetch = FetchType.EAGER)
     @JoinTable(
             name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id")
     )
-    public Set<UserRole> getAuthorities() {
+    public Set<Role> getAuthorities() {
         return this.authorities;
     }
 
-    public void setAuthorities(Set<UserRole> authorities) {
+    public void setAuthorities(Set<Role> authorities) {
         this.authorities = authorities;
     }
 

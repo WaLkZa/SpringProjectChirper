@@ -12,7 +12,7 @@
 
     <div class="content">
         <div class="chirper">
-            <h2 class="titlebar" th:text="${loggedUsername}"></h2>
+            <h2 class="titlebar" th:text="${currentLoggedUser.username}"></h2>
             <form id="formSubmitChirp" th:action="@{/chirp/edit/{id}(id = ${#strings.listSplit(#httpServletRequest.requestURI, '/')[2]})}" class="chirp-form" method="post">
                 <textarea name="content" class="chirp-input" th:field="${chirp.content}"></textarea>
                 <input class="chirp-submit" id="btnSubmitChirp" value="Edit" type="submit">

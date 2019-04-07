@@ -38,62 +38,52 @@ public class HomeController extends BaseController {
     }
 
     @GetMapping("/feed")
-    public ModelAndView home(Authentication authentication, ModelAndView modelAndView) {
-        modelAndView.addObject("loggedUsername", authentication.getName());
+    public ModelAndView home(ModelAndView modelAndView) {
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
-        User user = this.userService.getCurrentLoggedUser();
-
-        List<Chirp> allChirps = this.chirpService.getAllByFollowingUsers(user.getId());
+        List<Chirp> allChirps = this.chirpService.getAllByFollowingUsers(currentLoggedUser.getId());
 
         modelAndView.addObject("allChirps", allChirps);
-        modelAndView.addObject("user", user);
-
-//        if (this.getPrincipalAuthority(authentication) != null
-//                && this.getPrincipalAuthority(authentication).equals("ADMIN")){
-//            return this.view("admin-home", modelAndView);
-//        }
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("feed", modelAndView);
     }
 
     @GetMapping("/discover")
-    public ModelAndView discover(Authentication authentication, ModelAndView modelAndView) {
-        modelAndView.addObject("loggedUsername", authentication.getName());
+    public ModelAndView discover(ModelAndView modelAndView) {
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
         List<User> allUsers = this.userService.getAll();
 
         modelAndView.addObject("allUsers", allUsers);
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("discover", modelAndView);
     }
 
     @GetMapping("/profile")
-    public ModelAndView profile(Authentication authentication, ModelAndView modelAndView) {
-        modelAndView.addObject("loggedUsername", authentication.getName());
+    public ModelAndView profile(ModelAndView modelAndView) {
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
-        User user = this.userService.getCurrentLoggedUser();
-
-        modelAndView.addObject("user", user);
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("profile", modelAndView);
     }
 
     @GetMapping("/profile/{usernameArg}")
     public ModelAndView profile(@PathVariable("usernameArg") String usernameArg,
-                                Authentication authentication,
                                 ModelAndView modelAndView) {
-        modelAndView.addObject("loggedUsername", authentication.getName());
+
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         User user = (User) this.userService.loadUserByUsername(usernameArg);
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
-
-        modelAndView.addObject("user", user);
 
         if (currentLoggedUser.getId().equals(user.getId())) {
             return super.view("profile", modelAndView);
         }
 
-        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
+        modelAndView.addObject("user", user);
 
         return super.view("foreign_profile", modelAndView);
     }
