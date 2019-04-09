@@ -19,7 +19,7 @@
             <a th:unless="${currentLoggedUser.isUserFollowed(user)}" th:href="@{/user/follow/{id}(id = ${user.id})}" id="btnFollow" class="chirp-author">Follow</a>
 
             <div id="userProfileStats" class="user-details">
-                <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a class="following-list" th:href="@{/user/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a class="followers-list" th:href="@{/user/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
+                <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a class="modal-link" th:href="@{/user/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a class="modal-link" th:href="@{/user/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
             </div>
 
             <div id="myModal" class="chirps modal">
