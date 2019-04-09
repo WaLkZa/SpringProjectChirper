@@ -1,6 +1,8 @@
 package org.chirper.service;
 
 import org.chirper.domain.entities.User;
+import org.chirper.domain.models.view.UserAllFollowersViewModel;
+import org.chirper.domain.models.view.UserAllFollowingViewModel;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;
@@ -18,7 +20,7 @@ public interface UserService extends UserDetailsService {
 
     void unfollowUser(String followedId);
 
-    List<User> getUserAllFollowers(String userId);
+    List<UserAllFollowersViewModel> getUserAllFollowers(String userId);
 
-    List<User> getUserAllFollowing(String userId);
+    List<UserAllFollowingViewModel> getUserAllFollowing(String userId);
 }

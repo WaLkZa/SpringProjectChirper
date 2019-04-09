@@ -1,12 +1,13 @@
 package org.chirper.web.controllers;
 
-import org.chirper.domain.entities.User;
+import org.chirper.domain.models.view.UserAllFollowersViewModel;
+import org.chirper.domain.models.view.UserAllFollowingViewModel;
 import org.chirper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +23,7 @@ public class SubscribeController extends BaseController {
         this.userService = userService;
     }
 
-    @GetMapping("/follow/{toFollowId}")
+    @GetMapping("/user/follow/{toFollowId}")
     public ModelAndView followUser(@PathVariable(name = "toFollowId") String toFollowId,
                                    HttpServletRequest request) {
 
@@ -31,7 +32,7 @@ public class SubscribeController extends BaseController {
         return super.redirect(request.getHeader("Referer"));
     }
 
-    @GetMapping("/unfollow/{followedId}")
+    @GetMapping("/user/unfollow/{followedId}")
     public ModelAndView unfollowUser(@PathVariable(name = "followedId") String followedId,
                                      HttpServletRequest request) {
 
@@ -40,32 +41,24 @@ public class SubscribeController extends BaseController {
         return super.redirect(request.getHeader("Referer"));
     }
 
-    @GetMapping("/followersList/{userId}")
-    public ModelAndView listFollowers(@PathVariable(name = "userId") String userId,
-                                      ModelAndView modelAndView) {
+    @GetMapping("/user/followersList/{userId}")
+    @ResponseBody
+    public List<UserAllFollowersViewModel> listFollowers(@PathVariable(name = "userId") String userId) {
 
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+        List<UserAllFollowersViewModel> allFollowersUsers
+                = this.userService.getUserAllFollowers(userId);
 
-        List<User> allUsers = this.userService.getUserAllFollowers(userId);
-
-        modelAndView.addObject("allUsers", allUsers);
-        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
-
-        return super.view("discover", modelAndView);
+        return allFollowersUsers;
     }
 
 
-    @GetMapping("/followingList/{userId}")
-    public ModelAndView listFollowing(@PathVariable(name = "userId") String userId,
-                                      ModelAndView modelAndView) {
+    @GetMapping("/user/followingList/{userId}")
+    @ResponseBody
+    public List<UserAllFollowingViewModel> listFollowing(@PathVariable(name = "userId") String userId) {
 
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+        List<UserAllFollowingViewModel> allFollowingUsers
+                = this.userService.getUserAllFollowing(userId);
 
-        List<User> allUsers = this.userService.getUserAllFollowing(userId);
-
-        modelAndView.addObject("allUsers", allUsers);
-        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
-
-        return super.view("discover", modelAndView);
+        return allFollowingUsers;
     }
 }

@@ -3,13 +3,16 @@ package org.chirper.service;
 import org.chirper.domain.entities.Chirp;
 import org.chirper.domain.entities.User;
 import org.chirper.domain.models.binding.ChirpCreateBindingModel;
+import org.chirper.domain.models.view.UserAllLikesViewModel;
 import org.chirper.repository.ChirpRepository;
 import org.chirper.repository.UserRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ChirpServiceImpl implements ChirpService {
@@ -19,11 +22,14 @@ public class ChirpServiceImpl implements ChirpService {
 
     private final ChirpRepository chirpRepository;
 
+    private final ModelMapper modelMapper;
+
     @Autowired
-    public ChirpServiceImpl(UserService userService, UserRepository userRepository, ChirpRepository chirpRepository) {
+    public ChirpServiceImpl(UserService userService, UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper) {
         this.userService = userService;
         this.userRepository = userRepository;
         this.chirpRepository = chirpRepository;
+        this.modelMapper = modelMapper;
     }
 
     @Override
@@ -44,10 +50,13 @@ public class ChirpServiceImpl implements ChirpService {
     }
 
     @Override
-    public List<User> getChirpLikes(String chirpId) {
+    public List<UserAllLikesViewModel> getChirpLikes(String chirpId) {
         Chirp currentChirp = this.chirpRepository.findById(chirpId).get();
 
-        List<User> likesUsers = currentChirp.getUserLikes();
+        List<UserAllLikesViewModel> likesUsers = currentChirp.getUserLikes()
+                .stream()
+                .map(user -> this.modelMapper.map(user, UserAllLikesViewModel.class))
+                .collect(Collectors.toList());
 
         return likesUsers;
     }

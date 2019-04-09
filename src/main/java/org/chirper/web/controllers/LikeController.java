@@ -1,12 +1,14 @@
 package org.chirper.web.controllers;
 
 import org.chirper.domain.entities.User;
+import org.chirper.domain.models.view.UserAllLikesViewModel;
 import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -15,13 +17,10 @@ import java.util.List;
 @Controller
 public class LikeController extends BaseController {
 
-    private final UserService userService;
-
     private final ChirpService chirpService;
 
     @Autowired
-    public LikeController(UserService userService, ChirpService chirpService) {
-        this.userService = userService;
+    public LikeController(ChirpService chirpService) {
         this.chirpService = chirpService;
     }
 
@@ -35,16 +34,12 @@ public class LikeController extends BaseController {
     }
 
     @GetMapping("/chirp/listLikes/{chirpId}")
-    public ModelAndView listLikes(@PathVariable(name = "chirpId") String chirpId,
-                                      ModelAndView modelAndView) {
+    @ResponseBody
+    public List<UserAllLikesViewModel> listLikes(@PathVariable(name = "chirpId") String chirpId) {
 
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+        List<UserAllLikesViewModel> likesUsers
+                = this.chirpService.getChirpLikes(chirpId);
 
-        List<User> likesUsers = this.chirpService.getChirpLikes(chirpId);
-
-        modelAndView.addObject("likesUsers", likesUsers);
-        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
-
-        return super.view("chirp/likes", modelAndView);
+        return likesUsers;
     }
 }

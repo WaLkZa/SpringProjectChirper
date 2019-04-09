@@ -19,8 +19,17 @@
                     <div><a th:href="@{'/profile/' + ${user.username}}" class="chirp-author" th:text="*{user.username}"></a></div>
 
                     <div class="user-details">
-                        <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a th:href="@{/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a th:href="@{/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
+                        <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a class="modal-link" th:href="@{/user/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a class="modal-link" th:href="@{/user/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
                     </div>
+                </div>
+            </div>
+            <div id="myModal" class="chirps modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+
+                    <h2 class="titlebar"></h2>
+
+                    <div class="userbox-modal"></div>
                 </div>
             </div>
         </div>
@@ -28,5 +37,7 @@
 
     <th:block th:replace="fragments/footer"></th:block>
 </div>
+<script th:src="@{/js/modal-fetch-data.js}"></script>
+<script th:src="@{/js/modal-window.js}"></script>
 </body>
 </html>

@@ -2,6 +2,8 @@ package org.chirper.service;
 
 import org.chirper.domain.entities.User;
 import org.chirper.domain.entities.Role;
+import org.chirper.domain.models.view.UserAllFollowersViewModel;
+import org.chirper.domain.models.view.UserAllFollowingViewModel;
 import org.chirper.repository.RoleRepository;
 import org.chirper.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -12,10 +14,10 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -123,6 +125,18 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    public UserDetails loadUserById(String id) throws UsernameNotFoundException {
+        User user = this.userRepository
+                .findById(id)
+                .orElse(null);
+
+        if (user == null) {
+            throw new UsernameNotFoundException("No such user.");
+        }
+
+        return user;
+    }
+
     @Override
     public User getCurrentLoggedUser() {
         UserDetails userDetails = (UserDetails) SecurityContextHolder
@@ -156,19 +170,25 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<User> getUserAllFollowers(String userId) {
-        User currentLoggedUser = this.getCurrentLoggedUser();
+    public List<UserAllFollowersViewModel> getUserAllFollowers(String userId) {
+        User currentUser = (User) this.loadUserById(userId);
 
-        List<User> allFollowers = currentLoggedUser.getFollowers();
+        List<UserAllFollowersViewModel> allFollowers = currentUser.getFollowers()
+                .stream()
+                .map(user -> this.modelMapper.map(user, UserAllFollowersViewModel.class))
+                .collect(Collectors.toList());
 
         return allFollowers;
     }
 
     @Override
-    public List<User> getUserAllFollowing(String userId) {
-        User currentLoggedUser = this.getCurrentLoggedUser();
+    public List<UserAllFollowingViewModel> getUserAllFollowing(String userId) {
+        User currentUser = (User) this.loadUserById(userId);
 
-        List<User> allFollowing = currentLoggedUser.getFollowing();
+        List<UserAllFollowingViewModel> allFollowing = currentUser.getFollowing()
+                .stream()
+                .map(user -> this.modelMapper.map(user, UserAllFollowingViewModel.class))
+                .collect(Collectors.toList());
 
         return allFollowing;
     }

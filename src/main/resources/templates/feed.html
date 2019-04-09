@@ -18,7 +18,7 @@
                 <div class="titlebar">
                     <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
                     <span class="chirp-time">
-                        <a th:href="@{/chirp/listLikes/{id}(id = ${chirp.id})}" th:text="${'Likes: ' + chirp.getUserLikesCounter()}"></a> |
+                        <a class="modal-link" th:href="@{/chirp/listLikes/{id}(id = ${chirp.id})}" th:text="${'Likes: ' + chirp.getUserLikesCounter()}"></a> |
                         <a th:href="@{/chirp/like/{id}(id = ${chirp.id})}"><i class="fas fa-thumbs-up"></i></a> |
                         <th:block sec:authorize="hasRole('ROLE_ADMIN')">
                             <a th:href="@{/chirp/edit/{id}(id = ${chirp.id})}"><i class="fas fa-edit"></i></a> |
@@ -29,10 +29,21 @@
                 </div>
                 <p th:text="*{chirp.content}"</p>
             </article>
+            <div id="myModal" class="chirps modal">
+                <div class="modal-content">
+                    <span class="close">&times;</span>
+
+                    <h2 class="titlebar"></h2>
+
+                    <div class="userbox-modal"></div>
+                </div>
+            </div>
         </div>
     </div>
 
     <th:block th:replace="fragments/footer"></th:block>
 </div>
+<script th:src="@{/js/modal-fetch-data.js}"></script>
+<script th:src="@{/js/modal-window.js}"></script>
 </body>
 </html>
