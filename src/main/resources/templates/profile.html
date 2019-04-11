@@ -21,7 +21,7 @@
             </form>
 
             <div id="myStats" class="user-details">
-                <span th:text="${currentLoggedUser.getChirpsCounter() + ' chirps'}"></span> | <a class="modal-link" th:href="@{/user/followingList/{id}(id = ${currentLoggedUser.id})}" th:text="${currentLoggedUser.getFollowingCounter() + ' following'}"></a> | <a class="modal-link" th:href="@{/user/followersList/{id}(id = ${currentLoggedUser.id})}" th:text="${currentLoggedUser.getFollowersCounter() + ' followers'}"></a>
+                <span th:text="${currentLoggedUser.getChirpsCounter() + ' chirps'}"></span> | <a class="modal-link" th:href="@{/api/followingList/{id}(id = ${currentLoggedUser.id})}" th:text="${currentLoggedUser.getFollowingCounter() + ' following'}"></a> | <a class="modal-link" th:href="@{/api/followersList/{id}(id = ${currentLoggedUser.id})}" th:text="${currentLoggedUser.getFollowersCounter() + ' followers'}"></a>
             </div>
 
             <div id="myModal" class="chirps modal">
@@ -40,7 +40,7 @@
                 <div class="titlebar">
                     <a th:href="@{'/profile/' + ${chirp.author.username}}" class="chirp-author" th:text="*{chirp.author.username}"></a>
                     <span class="chirp-time">
-                        <a class="modal-link" th:href="@{/chirp/listLikes/{id}(id = ${chirp.id})}" th:text="${'Likes: ' + chirp.getUserLikesCounter()}"></a> |
+                        <a class="modal-link" th:href="@{/api/listLikes/{id}(id = ${chirp.id})}" th:text="${'Likes: ' + chirp.getUserLikesCounter()}"></a> |
                         <a th:href="@{/chirp/edit/{id}(id = ${chirp.id})}"><i class="fas fa-edit"></i></a> |
                         <a th:href="@{/chirp/delete/{id}(id = ${chirp.id})}"><i class="fas fa-trash"></i></a> |
                         <th:block th:text="${chirp.getTimeAgo()}"/>

@@ -19,7 +19,7 @@
                     <div><a th:href="@{'/profile/' + ${user.username}}" class="chirp-author" th:text="*{user.username}"></a></div>
 
                     <div class="user-details">
-                        <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a class="modal-link" th:href="@{/user/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a class="modal-link" th:href="@{/user/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
+                        <span th:text="${user.getChirpsCounter() + ' chirps'}"></span> | <a class="modal-link" th:href="@{/api/followingList/{id}(id = ${user.id})}" th:text="${user.getFollowingCounter() + ' following'}"></a> | <a class="modal-link" th:href="@{/api/followersList/{id}(id = ${user.id})}" th:text="${user.getFollowersCounter() + ' followers'}"></a>
                     </div>
                 </div>
             </div>

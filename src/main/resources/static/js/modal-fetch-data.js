@@ -31,14 +31,14 @@ $(document).ready(function () {
             .then((json) => {
 
                 if (json.length === 0) {
-                    usersModal.append(`<p>${emptyListInfo}`)
+                    usersModal.append(`<div class="userbox"><div>${emptyListInfo}</div></div>`)
                 } else {
                     for (let i = 0; i < json.length; i++) {
                         usersModal.append(`<div class="userbox"><div><a href="/profile/${json[i].username}" class="chirp-author">${json[i].username}</a></div></div>`)
                     }
                 }
             }).catch(function () {
-            usersModal.append(`<p>Something went wrong while fetching data!`)
+            usersModal.append(`<div class="userbox"><div>Something went wrong while fetching data!</div></div>`)
         });
 
         return false;
