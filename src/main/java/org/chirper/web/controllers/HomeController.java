@@ -4,6 +4,7 @@ import org.chirper.domain.entities.Chirp;
 import org.chirper.domain.entities.User;
 import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
+import org.chirper.web.annotations.PageTitle;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -27,6 +28,7 @@ public class HomeController extends BaseController {
     }
 
     @GetMapping("/")
+    @PageTitle("Index")
     public ModelAndView index(HttpSession sessionArg) {
         HttpSession session = (HttpSession) sessionArg.getAttribute("username");
 
@@ -38,6 +40,7 @@ public class HomeController extends BaseController {
     }
 
     @GetMapping("/feed")
+    @PageTitle("Feed")
     public ModelAndView home(ModelAndView modelAndView) {
         User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
@@ -50,6 +53,7 @@ public class HomeController extends BaseController {
     }
 
     @GetMapping("/discover")
+    @PageTitle("Discover users")
     public ModelAndView discover(ModelAndView modelAndView) {
         User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
@@ -62,6 +66,7 @@ public class HomeController extends BaseController {
     }
 
     @GetMapping("/profile")
+    @PageTitle("My profile")
     public ModelAndView profile(ModelAndView modelAndView) {
         User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
@@ -71,6 +76,7 @@ public class HomeController extends BaseController {
     }
 
     @GetMapping("/profile/{usernameArg}")
+    @PageTitle("Foreign profile")
     public ModelAndView profile(@PathVariable("usernameArg") String usernameArg,
                                 ModelAndView modelAndView) {
 

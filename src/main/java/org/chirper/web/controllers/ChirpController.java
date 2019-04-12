@@ -9,6 +9,7 @@ import org.chirper.repository.UserRepository;
 import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
 import org.chirper.validation.chirp.ChirpCreateValidator;
+import org.chirper.web.annotations.PageTitle;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
@@ -63,6 +64,7 @@ public class ChirpController extends BaseController {
     }
 
     @GetMapping("/chirp/edit/{id}")
+    @PageTitle("Edit chirp")
     public ModelAndView editChirp(@PathVariable(name = "id") String id,
                                   Authentication authentication,
                                   ModelAndView modelAndView,

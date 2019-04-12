@@ -5,6 +5,7 @@ import org.chirper.domain.models.binding.UserRegisterBindingModel;
 import org.chirper.domain.models.view.UserAllViewModel;
 import org.chirper.service.UserService;
 import org.chirper.validation.user.UserRegisterValidator;
+import org.chirper.web.annotations.PageTitle;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -36,11 +37,13 @@ public class UserController extends BaseController {
     }
 
     @GetMapping("/login")
+    @PageTitle("Login")
     public ModelAndView login() {
         return this.view("login");
     }
 
     @GetMapping("/register")
+    @PageTitle("Register")
     public ModelAndView register(ModelAndView modelAndView,
                                  @ModelAttribute(name = "model") UserRegisterBindingModel model) {
         modelAndView.addObject("model", model);
@@ -68,6 +71,7 @@ public class UserController extends BaseController {
 
     @GetMapping("/roles")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
+    @PageTitle("Users roles")
     public ModelAndView allUsers(ModelAndView modelAndView) {
         User currentLoggedUser = this.userService.getCurrentLoggedUser();
         modelAndView.addObject("currentLoggedUser", currentLoggedUser);
