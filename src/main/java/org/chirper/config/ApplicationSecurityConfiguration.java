@@ -42,6 +42,9 @@ public class ApplicationSecurityConfiguration extends WebSecurityConfigurerAdapt
                     .key("PLYOK")
                     .userDetailsService(this.userService)
                     .rememberMeCookieName("KLYOK")
-                    .tokenValiditySeconds(1200);
+                    .tokenValiditySeconds(1200)
+                .and()
+                    .exceptionHandling()
+                    .accessDeniedPage("/");
     }
 }

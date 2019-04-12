@@ -2,6 +2,7 @@ package org.chirper.web.controllers;
 
 import org.chirper.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,6 +21,7 @@ public class SubscribeController extends BaseController {
     }
 
     @GetMapping("/user/follow/{toFollowId}")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView followUser(@PathVariable(name = "toFollowId") String toFollowId,
                                    HttpServletRequest request) {
 
@@ -29,6 +31,7 @@ public class SubscribeController extends BaseController {
     }
 
     @GetMapping("/user/unfollow/{followedId}")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView unfollowUser(@PathVariable(name = "followedId") String followedId,
                                      HttpServletRequest request) {
 

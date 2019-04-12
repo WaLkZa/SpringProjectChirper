@@ -4,6 +4,7 @@ import org.chirper.domain.entities.Chirp;
 import org.chirper.domain.entities.User;
 import org.chirper.domain.models.binding.ChirpCreateBindingModel;
 import org.chirper.domain.models.view.UserAllLikesViewModel;
+import org.chirper.error.ChirpNotFoundException;
 import org.chirper.repository.ChirpRepository;
 import org.chirper.repository.UserRepository;
 import org.modelmapper.ModelMapper;
@@ -34,7 +35,9 @@ public class ChirpServiceImpl implements ChirpService {
 
     @Override
     public void likeAndUnlikeAChirp(String chirpId) {
-        Chirp currentChirp = this.chirpRepository.findById(chirpId).get();
+        Chirp currentChirp = this.chirpRepository.findById(chirpId)
+                .orElseThrow(() -> new ChirpNotFoundException("Chirp with the given id was not found!"));
+
         User currentLoggedUser = this.userService.getCurrentLoggedUser();
 
         boolean isChirpLikeExist = currentLoggedUser.isChirpLikeExist(currentChirp);
@@ -51,7 +54,9 @@ public class ChirpServiceImpl implements ChirpService {
 
     @Override
     public List<UserAllLikesViewModel> getChirpLikes(String chirpId) {
-        Chirp currentChirp = this.chirpRepository.findById(chirpId).get();
+        Chirp currentChirp = this.chirpRepository
+                .findById(chirpId)
+                .orElseThrow(() -> new ChirpNotFoundException("Chirp with the given id was not found!"));
 
         List<UserAllLikesViewModel> likesUsers = currentChirp.getUserLikes()
                 .stream()
@@ -79,5 +84,27 @@ public class ChirpServiceImpl implements ChirpService {
 
         this.chirpRepository.saveAndFlush(chirp);
         this.userRepository.saveAndFlush(author);
+    }
+
+    @Override
+    public boolean deleteChirp(String chirpId) {
+        Chirp chirp = this.chirpRepository.findById(chirpId)
+                .orElseThrow(() -> new ChirpNotFoundException("Chirp with the given id was not found!"));
+
+//        User author = this.userService.getCurrentLoggedUser();
+
+//        if (!author.isAuthor(chirp)) {
+//            return false;
+//        }
+
+        List<User> chirpUserLikes = chirp.getUserLikes();
+
+        for (User user : chirpUserLikes) {
+            user.removeChirpLike(chirp);
+        }
+
+        this.chirpRepository.delete(chirp);
+
+        return true;
     }
 }

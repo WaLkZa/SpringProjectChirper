@@ -290,9 +290,19 @@ table#userlist th {
     cursor: pointer;
 }
 
+.not-found {
+    margin: 20px auto;
+    padding: 20px;
+    text-align: center;
+    color: gray;
+}
+
 .not-found p:nth-child(1) {
+    font-size: 100px;
+}
+
+.not-found p:nth-child(2) {
     font-size: 20px;
-    padding-bottom: 10px;
 }
 
 .error {

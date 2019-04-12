@@ -37,12 +37,14 @@ public class UserController extends BaseController {
     }
 
     @GetMapping("/login")
+    @PreAuthorize("isAnonymous()")
     @PageTitle("Login")
     public ModelAndView login() {
         return this.view("login");
     }
 
     @GetMapping("/register")
+    @PreAuthorize("isAnonymous()")
     @PageTitle("Register")
     public ModelAndView register(ModelAndView modelAndView,
                                  @ModelAttribute(name = "model") UserRegisterBindingModel model) {
@@ -52,6 +54,7 @@ public class UserController extends BaseController {
     }
 
     @PostMapping("/register")
+    @PreAuthorize("isAnonymous()")
     public ModelAndView registerConfirm(
             ModelAndView modelAndView, @ModelAttribute(name = "model") UserRegisterBindingModel userRegisterBindingModel,
             BindingResult bindingResult) {
@@ -67,6 +70,51 @@ public class UserController extends BaseController {
         this.userService.createUser(this.modelMapper.map(userRegisterBindingModel, User.class));
 
         return this.redirect("/login");
+    }
+
+    @GetMapping("/discover")
+    @PreAuthorize("isAuthenticated()")
+    @PageTitle("Discover users")
+    public ModelAndView discover(ModelAndView modelAndView) {
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+
+        List<User> allUsers = this.userService.getAll();
+
+        modelAndView.addObject("allUsers", allUsers);
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
+
+        return super.view("discover", modelAndView);
+    }
+
+    @GetMapping("/profile")
+    @PreAuthorize("isAuthenticated()")
+    @PageTitle("My profile")
+    public ModelAndView profile(ModelAndView modelAndView) {
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
+
+        return super.view("profile", modelAndView);
+    }
+
+    @GetMapping("/profile/{usernameArg}")
+    @PreAuthorize("isAuthenticated()")
+    @PageTitle("Foreign profile")
+    public ModelAndView profile(@PathVariable("usernameArg") String usernameArg,
+                                ModelAndView modelAndView) {
+
+        User currentLoggedUser = this.userService.getCurrentLoggedUser();
+        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
+
+        User user = (User) this.userService.loadUserByUsername(usernameArg);
+
+        if (currentLoggedUser.getId().equals(user.getId())) {
+            return super.view("profile", modelAndView);
+        }
+
+        modelAndView.addObject("user", user);
+
+        return super.view("foreign_profile", modelAndView);
     }
 
     @GetMapping("/roles")

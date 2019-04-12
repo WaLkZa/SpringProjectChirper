@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <th:block th:replace="fragments/head"></th:block>
+</head>
+<body>
+<div id="main">
+    <th:block th:replace="fragments/header"></th:block>
+
+    <div class="content">
+        <div class="not-found">
+            <p th:text="${'Error ' + statusCode}"></p>
+            <p th:text="${message}"></p>
+            <!--<img th:src="'https://http.cat/' + ${statusCode}" alt="Cat">-->
+        </div>
+    </div>
+
+    <th:block th:replace="fragments/footer"></th:block>
+</div>
+</body>
+</html>

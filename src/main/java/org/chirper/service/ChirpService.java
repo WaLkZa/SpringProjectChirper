@@ -1,7 +1,6 @@
 package org.chirper.service;
 
 import org.chirper.domain.entities.Chirp;
-import org.chirper.domain.entities.User;
 import org.chirper.domain.models.binding.ChirpCreateBindingModel;
 import org.chirper.domain.models.view.UserAllLikesViewModel;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,4 +15,6 @@ public interface ChirpService {
     List<Chirp> getAllByFollowingUsers(String currentUserId);
 
     void createChirp(@ModelAttribute ChirpCreateBindingModel chirpCreateBindingModel);
+
+    boolean deleteChirp(String chirpId);
 }

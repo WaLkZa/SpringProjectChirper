@@ -6,13 +6,11 @@ import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
 import org.chirper.web.annotations.PageTitle;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
@@ -28,18 +26,14 @@ public class HomeController extends BaseController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("isAnonymous()")
     @PageTitle("Index")
-    public ModelAndView index(HttpSession sessionArg) {
-        HttpSession session = (HttpSession) sessionArg.getAttribute("username");
-
-        if (session != null) {
-            return super.redirect("feed");
-        } else {
-            return super.redirect("login");
-        }
+    public ModelAndView index() {
+        return super.redirect("login");
     }
 
     @GetMapping("/feed")
+    @PreAuthorize("isAuthenticated()")
     @PageTitle("Feed")
     public ModelAndView home(ModelAndView modelAndView) {
         User currentLoggedUser = this.userService.getCurrentLoggedUser();
@@ -50,47 +44,5 @@ public class HomeController extends BaseController {
         modelAndView.addObject("currentLoggedUser", currentLoggedUser);
 
         return super.view("feed", modelAndView);
-    }
-
-    @GetMapping("/discover")
-    @PageTitle("Discover users")
-    public ModelAndView discover(ModelAndView modelAndView) {
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
-
-        List<User> allUsers = this.userService.getAll();
-
-        modelAndView.addObject("allUsers", allUsers);
-        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
-
-        return super.view("discover", modelAndView);
-    }
-
-    @GetMapping("/profile")
-    @PageTitle("My profile")
-    public ModelAndView profile(ModelAndView modelAndView) {
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
-
-        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
-
-        return super.view("profile", modelAndView);
-    }
-
-    @GetMapping("/profile/{usernameArg}")
-    @PageTitle("Foreign profile")
-    public ModelAndView profile(@PathVariable("usernameArg") String usernameArg,
-                                ModelAndView modelAndView) {
-
-        User currentLoggedUser = this.userService.getCurrentLoggedUser();
-        modelAndView.addObject("currentLoggedUser", currentLoggedUser);
-
-        User user = (User) this.userService.loadUserByUsername(usernameArg);
-
-        if (currentLoggedUser.getId().equals(user.getId())) {
-            return super.view("profile", modelAndView);
-        }
-
-        modelAndView.addObject("user", user);
-
-        return super.view("foreign_profile", modelAndView);
     }
 }
