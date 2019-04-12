@@ -289,3 +289,13 @@ table#userlist th {
     text-decoration: none;
     cursor: pointer;
 }
+
+.not-found p:nth-child(1) {
+    font-size: 20px;
+    padding-bottom: 10px;
+}
+
+.error {
+    color: red;
+    font-family: "Harlow Solid Italic";
+}

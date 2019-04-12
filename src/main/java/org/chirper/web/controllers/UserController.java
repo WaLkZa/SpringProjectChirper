@@ -4,10 +4,12 @@ import org.chirper.domain.entities.User;
 import org.chirper.domain.models.binding.UserRegisterBindingModel;
 import org.chirper.domain.models.view.UserAllViewModel;
 import org.chirper.service.UserService;
+import org.chirper.validation.user.UserRegisterValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,10 +26,13 @@ public class UserController extends BaseController {
 
     private final ModelMapper modelMapper;
 
+    private final UserRegisterValidator userRegisterValidator;
+
     @Autowired
-    public UserController(UserService userService, ModelMapper modelMapper) {
+    public UserController(UserService userService, ModelMapper modelMapper, UserRegisterValidator userRegisterValidator) {
         this.userService = userService;
         this.modelMapper = modelMapper;
+        this.userRegisterValidator = userRegisterValidator;
     }
 
     @GetMapping("/login")
@@ -36,15 +41,24 @@ public class UserController extends BaseController {
     }
 
     @GetMapping("/register")
-    public ModelAndView register() {
-        return this.view("register");
+    public ModelAndView register(ModelAndView modelAndView,
+                                 @ModelAttribute(name = "model") UserRegisterBindingModel model) {
+        modelAndView.addObject("model", model);
+
+        return this.view("register", modelAndView);
     }
 
     @PostMapping("/register")
-    public ModelAndView registerConfirm(@ModelAttribute UserRegisterBindingModel userRegisterBindingModel) {
-        if (!userRegisterBindingModel.getPassword()
-                .equals(userRegisterBindingModel.getConfirmPassword())) {
-            return this.view("register");
+    public ModelAndView registerConfirm(
+            ModelAndView modelAndView, @ModelAttribute(name = "model") UserRegisterBindingModel userRegisterBindingModel,
+            BindingResult bindingResult) {
+
+        this.userRegisterValidator.validate(userRegisterBindingModel, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            modelAndView.addObject("model", userRegisterBindingModel);
+
+            return this.view("register", modelAndView);
         }
 
         this.userService.createUser(this.modelMapper.map(userRegisterBindingModel, User.class));

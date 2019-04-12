@@ -9,11 +9,24 @@
     <th:block th:replace="fragments/header"></th:block>
 
     <div class="content">
+        <th:block th:if="${param.error}">
+            <script th:inline="javascript">
+                let message = [[${session.SPRING_SECURITY_LAST_EXCEPTION.message}]];
+                toastr.error(message);
+            </script>
+        </th:block>
+
+        <th:block th:if="${param.logout}">
+            <script th:inline="javascript">
+                toastr.success('Logout successful');
+            </script>
+        </th:block>
+
         <form id="formLogin" class="form chirps" th:action="@{/login}" th:method="POST">
             <label>Username</label>
-            <input name="username" type="text" th:value="test">
+            <input name="username" type="text" placeholder="Username..." th:value="test">
             <label>Password</label>
-            <input name="password" type="password" th:value="test">
+            <input name="password" type="password" placeholder="Password..." th:value="test">
             <label for="rememberMe">Remember Me</label>
             <input type="checkbox" id="rememberMe" name="rememberMe">
             <input id="btnLogin" value="Sign In" type="submit">

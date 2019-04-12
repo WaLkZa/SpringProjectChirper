@@ -15,8 +15,14 @@
 
             <h2 class="titlebar">New chirp</h2>
 
-            <form id="formSubmitChirp" th:action="@{/chirp/create}" class="chirp-form" th:method="post">
+            <form id="formSubmitChirp" th:action="@{/chirp/create}" class="chirp-form" th:method="post" th:object="${model}">
                 <textarea name="content" class="chirp-input"></textarea>
+                <th:block th:if="${model != null && #fields.hasErrors('content')}">
+                    <script th:inline="javascript">
+                        let message = [[${#fields.errors('content')}]];
+                        toastr.error(message);
+                    </script>
+                </th:block>
                 <input class="chirp-submit" id="btnSubmitChirp" value="Publish" type="submit">
             </form>
 

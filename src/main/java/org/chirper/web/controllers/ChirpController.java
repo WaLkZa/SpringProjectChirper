@@ -8,10 +8,12 @@ import org.chirper.repository.ChirpRepository;
 import org.chirper.repository.UserRepository;
 import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
+import org.chirper.validation.chirp.ChirpCreateValidator;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,16 +33,30 @@ public class ChirpController extends BaseController {
 
     private final ChirpRepository chirpRepository;
 
+    private final ChirpCreateValidator createValidator;
+
     @Autowired
-    public ChirpController(UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper, UserService userService, ChirpService chirpService) {
+    public ChirpController(UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper, UserService userService, ChirpService chirpService, ChirpCreateValidator createValidator) {
         this.userRepository = userRepository;
         this.chirpRepository = chirpRepository;
         this.userService = userService;
         this.chirpService = chirpService;
+        this.createValidator = createValidator;
     }
 
     @PostMapping("/chirp/create")
-    public ModelAndView createChirpConfirm(@ModelAttribute ChirpCreateBindingModel chirpCreateBindingModel) {
+    public ModelAndView createChirpConfirm(ModelAndView modelAndView, @ModelAttribute(name = "model") ChirpCreateBindingModel chirpCreateBindingModel, BindingResult bindingResult) {
+        this.createValidator.validate(chirpCreateBindingModel, bindingResult);
+
+        if (bindingResult.hasErrors()) {
+            User currentLoggedUser = this.userService.getCurrentLoggedUser();
+
+            modelAndView.addObject("currentLoggedUser", currentLoggedUser);
+            modelAndView.addObject("model", chirpCreateBindingModel);
+
+            return super.view("profile", modelAndView);
+        }
+
         this.chirpService.createChirp(chirpCreateBindingModel);
 
         return super.redirect("/profile");
@@ -49,7 +65,8 @@ public class ChirpController extends BaseController {
     @GetMapping("/chirp/edit/{id}")
     public ModelAndView editChirp(@PathVariable(name = "id") String id,
                                   Authentication authentication,
-                                  ModelAndView modelAndView) {
+                                  ModelAndView modelAndView,
+                                  @ModelAttribute(name = "model") ChirpEditBindingModel chirpEditBindingModel) {
 
         if (!this.chirpRepository.existsById(id)) {
             return super.redirect("/profile");
@@ -64,6 +81,7 @@ public class ChirpController extends BaseController {
 
         modelAndView.addObject("currentLoggedUser", author);
         modelAndView.addObject("chirp", chirp);
+//        modelAndView.addObject("model", chirpEditBindingModel);
 
         return super.view("chirp/edit", modelAndView);
     }
@@ -71,10 +89,21 @@ public class ChirpController extends BaseController {
     @PostMapping("/chirp/edit/{id}")
     public ModelAndView editChirpConfirm(@PathVariable(name = "id") String id,
                                          Authentication authentication,
-                                         @ModelAttribute ChirpEditBindingModel chirpEditBindingModel,
-                                  ModelAndView modelAndView) {
+                                         @ModelAttribute(name = "model") ChirpEditBindingModel chirpEditBindingModel,
+                                  ModelAndView modelAndView, BindingResult bindingResult) {
 
-//        User author = this.userService.getCurrentLoggedUser();
+//        this.editValidator.validate(chirpEditBindingModel, bindingResult);
+//
+//        if (bindingResult.hasErrors()) {
+//            User currentLoggedUser = this.userService.getCurrentLoggedUser();
+//
+//            modelAndView.addObject("currentLoggedUser", currentLoggedUser);
+//            modelAndView.addObject("model", chirpEditBindingModel);
+//
+//            return super.view("chirp/edit", modelAndView);
+//        }
+
+        //        User author = this.userService.getCurrentLoggedUser();
         Chirp chirp = this.chirpRepository.findById(id).get();
 
 //        if (!author.isAuthor(chirp)) {

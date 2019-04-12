@@ -9,13 +9,28 @@
     <th:block th:replace="fragments/header"></th:block>
 
     <div class="content">
-        <form class="form chirps" id="formRegister" th:action="@{/register}" th:method="POST">
+        <form class="form chirps" id="formRegister" th:action="@{/register}" th:method="POST" th:object="${model}">
             <label>Username</label>
-            <input name="username" type="text">
+            <input name="username" type="text" placeholder="Username..." th:value="*{username}">
+
+            <th:block th:if="${#fields.hasErrors('username')}">
+                <small class="error" th:errors="*{username}"></small>
+            </th:block>
+
             <label>Password</label>
-            <input name="password" type="password">
+            <input name="password" type="password" placeholder="Password..." th:value="*{password}">
+
+            <th:block th:if="${#fields.hasErrors('password')}">
+                <small class="error" th:errors="*{password}"></small>
+            </th:block>
+
             <label>Confirm Password</label>
-            <input name="confirmPassword" type="password">
+            <input name="confirmPassword" type="password" placeholder="Confirm Password..." th:value="*{confirmPassword}">
+
+            <th:block th:if="${#fields.hasErrors('password')}">
+                <small class="error" th:errors="*{password}"></small>
+            </th:block>
+
             <input id="btnRegister" value="Register" type="submit">
             <a th:href="@{/login}">Log in</a>
         </form>
