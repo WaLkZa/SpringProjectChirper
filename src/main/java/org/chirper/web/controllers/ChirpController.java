@@ -6,13 +6,14 @@ import org.chirper.domain.models.binding.ChirpCreateBindingModel;
 import org.chirper.domain.models.binding.ChirpEditBindingModel;
 import org.chirper.error.ChirpNotFoundException;
 import org.chirper.repository.ChirpRepository;
-import org.chirper.repository.UserRepository;
 import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
 import org.chirper.validation.chirp.ChirpCreateValidator;
+import org.chirper.validation.chirp.ChirpEditValidator;
 import org.chirper.web.annotations.PageTitle;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
@@ -28,15 +29,12 @@ public class ChirpController extends BaseController {
 
     private final ChirpService chirpService;
 
-    private final UserRepository userRepository;
-
     private final ChirpRepository chirpRepository;
 
     private final ChirpCreateValidator createValidator;
 
     @Autowired
-    public ChirpController(UserRepository userRepository, ChirpRepository chirpRepository, ModelMapper modelMapper, UserService userService, ChirpService chirpService, ChirpCreateValidator createValidator) {
-        this.userRepository = userRepository;
+    public ChirpController(ChirpRepository chirpRepository, ModelMapper modelMapper, UserService userService, ChirpService chirpService, ChirpCreateValidator createValidator) {
         this.chirpRepository = chirpRepository;
         this.userService = userService;
         this.chirpService = chirpService;
@@ -44,6 +42,7 @@ public class ChirpController extends BaseController {
     }
 
     @PostMapping("/chirp/create")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView createChirpConfirm(ModelAndView modelAndView, @ModelAttribute(name = "model") ChirpCreateBindingModel chirpCreateBindingModel, BindingResult bindingResult) {
         this.createValidator.validate(chirpCreateBindingModel, bindingResult);
 
@@ -62,6 +61,7 @@ public class ChirpController extends BaseController {
     }
 
     @GetMapping("/chirp/edit/{id}")
+    @PreAuthorize("isAuthenticated()")
     @PageTitle("Edit chirp")
     public ModelAndView editChirp(@PathVariable(name = "id") String id,
                                   Authentication authentication,
@@ -85,6 +85,7 @@ public class ChirpController extends BaseController {
     }
 
     @PostMapping("/chirp/edit/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView editChirpConfirm(@PathVariable(name = "id") String id,
                                          Authentication authentication,
                                          @ModelAttribute(name = "model") ChirpEditBindingModel chirpEditBindingModel,
@@ -118,6 +119,7 @@ public class ChirpController extends BaseController {
     }
 
     @GetMapping("/chirp/delete/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ModelAndView deleteChirpConfirm(@PathVariable(name = "id") String id,
                                            HttpServletRequest request) {
 
