@@ -1,1 +1,1 @@
-# SpringProjectChirper
+Web application using Spring framework and MySQL database. The app keeps users, chirps (tweets) and likes. Users can register, login, logout, view feed page (all chirps from followers sorted by time in descending order), create a chirp, delete a chirp, view own chirps, discover new people, get all chirps by specific user (sorted by time in descending order), follow or unfollow a user, like or dislike a chirp. Admins have access to edit and delete chirps to all users and manage user roles.
