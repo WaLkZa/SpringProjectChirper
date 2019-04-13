@@ -9,19 +9,16 @@ import org.chirper.repository.ChirpRepository;
 import org.chirper.service.ChirpService;
 import org.chirper.service.UserService;
 import org.chirper.validation.chirp.ChirpCreateValidator;
-import org.chirper.validation.chirp.ChirpEditValidator;
 import org.chirper.web.annotations.PageTitle;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.time.LocalDateTime;
 
 @Controller
 public class ChirpController extends BaseController {
@@ -64,7 +61,6 @@ public class ChirpController extends BaseController {
     @PreAuthorize("isAuthenticated()")
     @PageTitle("Edit chirp")
     public ModelAndView editChirp(@PathVariable(name = "id") String id,
-                                  Authentication authentication,
                                   ModelAndView modelAndView,
                                   @ModelAttribute(name = "model") ChirpEditBindingModel chirpEditBindingModel) {
 
@@ -87,33 +83,11 @@ public class ChirpController extends BaseController {
     @PostMapping("/chirp/edit/{id}")
     @PreAuthorize("isAuthenticated()")
     public ModelAndView editChirpConfirm(@PathVariable(name = "id") String id,
-                                         Authentication authentication,
-                                         @ModelAttribute(name = "model") ChirpEditBindingModel chirpEditBindingModel,
-                                  ModelAndView modelAndView, BindingResult bindingResult) {
+                                         @ModelAttribute(name = "model") ChirpEditBindingModel chirpEditBindingModel) {
 
-//        this.editValidator.validate(chirpEditBindingModel, bindingResult);
-//
-//        if (bindingResult.hasErrors()) {
-//            User currentLoggedUser = this.userService.getCurrentLoggedUser();
-//
-//            modelAndView.addObject("currentLoggedUser", currentLoggedUser);
-//            modelAndView.addObject("model", chirpEditBindingModel);
-//
-//            return super.view("chirp/edit", modelAndView);
-//        }
-
-        //        User author = this.userService.getCurrentLoggedUser();
-        Chirp chirp = this.chirpRepository.findById(id)
-                .orElseThrow(() -> new ChirpNotFoundException("Chirp with the given id was not found!"));
-
-//        if (!author.isAuthor(chirp)) {
-//            return super.redirect("/profile");
-//        }
-
-        chirp.setContent(chirpEditBindingModel.getContent());
-        chirp.setDateAdded(LocalDateTime.now());
-
-        this.chirpRepository.saveAndFlush(chirp);
+        if (!this.chirpService.editChirp(id, chirpEditBindingModel)) {
+            return super.redirect("/profile");
+        }
 
         return super.redirect(id);
     }
