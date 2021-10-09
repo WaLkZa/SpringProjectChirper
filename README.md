@@ -8,6 +8,8 @@ Web application using Spring framework and MySQL database. The app keeps users, 
 
 <img width="960" alt="3discover" src="https://user-images.githubusercontent.com/17432777/136655731-ae8b4a55-f4d0-4e14-926c-ccc0f3a96b58.png">
 
+<img width="960" alt="7follow" src="https://user-images.githubusercontent.com/17432777/136668938-9cc0a589-0cdb-42cf-9df8-643fcd2e6d9b.png">
+
 <img width="960" alt="4followers" src="https://user-images.githubusercontent.com/17432777/136655732-7ab26e39-c067-421d-96ef-bece2fb22443.png">
 
 <img width="960" alt="5roles" src="https://user-images.githubusercontent.com/17432777/136655733-fc2ea45f-c364-4943-a64c-0d7b18c68287.png">
